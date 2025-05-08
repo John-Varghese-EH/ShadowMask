@@ -58,7 +58,7 @@ Special thanks to the open-source and academic communities for advancing privacy
 
 ---
 
-##🚧 Currently a work in progress, but I’d appreciate your support! ☺️
+## 🚧 Currently a work in progress, but I’d appreciate your support! ☺️
 <p align="left">
   <a href="https://buymeacoffee.com/CyberTrinity">
     <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" />
