@@ -15,9 +15,41 @@ ShadowMask is an tool to protect your privacy from unauthorized AI-based facial 
 ---
 
 ## Installation
-...
-...
-...
+
+git clone https://github.com/yourusername/shadowmask.git
+cd shadowmask
+pip install -r requirements.txt
+
+---
+
+## Usage
+
+### Alpha Layer Attack
+
+python src/alpha_attack.py visible_image.png ai_image.png output.png
+
+
+### Adversarial Pattern (FGSM)
+
+python src/adversarial_pattern.py input.jpg output.jpg --label 207
+
+---
+
+## Inspiration & Credits
+
+ShadowMask is inspired by leading research and pioneering privacy tools:
+
+- **AlphaDog (Alpha Channel Attacks):** Based on the AlphaDog method, which exploits the alpha channel to present different content to humans and AI.
+- **Fawkes by SAND Lab, University of Chicago:** [Fawkes](https://sandlab.cs.uchicago.edu/fawkes/) is a groundbreaking image cloaking tool.
+- **Adversarial Pattern Attacks:** Grounded in adversarial machine learning research.
+
+Special thanks to the open-source and academic communities for advancing privacy protection in the age of AI.
+
+---
+
+*For research and personal privacy protection only. Use responsibly.*
+
+---
 
 ## Currently a work in progress, but I’d appreciate your support! ☺️
 <p align="left">
