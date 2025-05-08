@@ -1,5 +1,23 @@
 # ShadowMask
-ShadowMask (Your Face, Your Rules – Unseen by AI) is a privacy-focused image protection tool designed to help individuals prevent unauthorized AI-based facial recognition and image scraping.
+
+**Your Face, Your Rules – Beyond AI’s Reach**
+
+ShadowMask is an tool to protect your privacy from unauthorized AI-based facial recognition and image scraping. It lets you cloak your images using Alpha Layer Attacks and Adversarial Patterns, making your photos appear normal to humans but confusing or unreadable to AI systems.
+
+---
+
+## Features
+
+- **Alpha Layer Attack:** Alters the transparency (alpha) channel of PNG images to disrupt AI recognition.
+- **Adversarial Pattern (FGSM):** Adds subtle, targeted noise to images to fool AI facial recognition.
+- **Simple CLI:** Easy-to-use command-line interface.
+
+---
+
+## Installation
+...
+...
+...
 
 ## Currently a work in progress, but I’d appreciate your support! ☺️
 <p align="left">
