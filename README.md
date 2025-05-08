@@ -1,12 +1,12 @@
 # ShadowMask
 
-**Your Face, Your Rules – Beyond AI’s Reach**
+**Your Face, Your Rules – Beyond AI’s Reach ✨**
 
 ShadowMask is an tool to protect your privacy from unauthorized AI-based facial recognition and image scraping. It lets you cloak your images using Alpha Layer Attacks and Adversarial Patterns, making your photos appear normal to humans but confusing or unreadable to AI systems.
 
 ---
 
-## Features
+## Features 🚀
 
 - **Alpha Layer Attack:** Alters the transparency (alpha) channel of PNG images to disrupt AI recognition.
 - **Adversarial Pattern (FGSM):** Adds subtle, targeted noise to images to fool AI facial recognition.
@@ -14,7 +14,7 @@ ShadowMask is an tool to protect your privacy from unauthorized AI-based facial 
 
 ---
 
-## Installation
+## Installation 🛠️
 
 > ```bash
 > git clone https://github.com/John-Varghese-EH/ShadowMask.git  
@@ -24,7 +24,7 @@ ShadowMask is an tool to protect your privacy from unauthorized AI-based facial 
 
 ---
 
-## Usage
+## Usage 🎯
 
 ### Alpha Layer Attack
 
@@ -41,7 +41,7 @@ ShadowMask is an tool to protect your privacy from unauthorized AI-based facial 
 
 ---
 
-## Inspiration & Credits
+## Inspiration & Credits 🙏
 
 ShadowMask is inspired by leading research and pioneering privacy tools:
 
@@ -54,11 +54,11 @@ Special thanks to the open-source and academic communities for advancing privacy
 ---
 
 > [!NOTE]
-> *For research and personal privacy protection only. Use responsibly.*
+> *⚠️ For research and personal privacy protection only. Use responsibly.*
 
 ---
 
-## Currently a work in progress, but I’d appreciate your support! ☺️
+##🚧 Currently a work in progress, but I’d appreciate your support! ☺️
 <p align="left">
   <a href="https://buymeacoffee.com/CyberTrinity">
     <img src="https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black" />
