@@ -58,6 +58,18 @@ Special thanks to the open-source and academic communities for advancing privacy
 
 ---
 
+## Suggestions & Feedback 💡
+
+Have ideas or want to help improve this project?
+
+> - Open an issue  
+> - Start a discussion  
+> - Or email me at [cybertrinity01@gmail.com](mailto:cybertrinity01@gmail.com)  
+
+Your feedback is appreciated! 
+
+---
+
 ## 🚧 Currently a work in progress, but I’d appreciate your support! ☺️
 <p align="left">
   <a href="https://buymeacoffee.com/CyberTrinity">
