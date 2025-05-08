@@ -16,7 +16,7 @@ ShadowMask is an tool to protect your privacy from unauthorized AI-based facial 
 
 ## Installation
 
-git clone https://github.com/yourusername/shadowmask.git
+git clone https://github.com/John-Varghese-EH/ShadowMask
 cd shadowmask
 pip install -r requirements.txt
 
