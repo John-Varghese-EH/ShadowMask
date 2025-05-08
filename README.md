@@ -29,7 +29,7 @@ ShadowMask is an tool to protect your privacy from unauthorized AI-based facial 
 ### Alpha Layer Attack
 
 > ```bash
-> python src/alpha_attack.py visible_image.png ai_image.png output.png
+> python src/alpha_attack.py visible_image.png ai_image.png output.png --preview
 > ```
 
 
