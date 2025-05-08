@@ -16,9 +16,11 @@ ShadowMask is an tool to protect your privacy from unauthorized AI-based facial 
 
 ## Installation
 
-git clone https://github.com/John-Varghese-EH/ShadowMask
-cd shadowmask
-pip install -r requirements.txt
+> ```bash
+> git clone https://github.com/John-Varghese-EH/ShadowMask.git  
+> cd shadowmask  
+> pip install -r requirements.txt
+> ```
 
 ---
 
@@ -26,12 +28,16 @@ pip install -r requirements.txt
 
 ### Alpha Layer Attack
 
-python src/alpha_attack.py visible_image.png ai_image.png output.png
+> ```bash
+> python src/alpha_attack.py visible_image.png ai_image.png output.png
+> ```
 
 
 ### Adversarial Pattern (FGSM)
 
-python src/adversarial_pattern.py input.jpg output.jpg --label 207
+> ```bash
+> python src/adversarial_pattern.py input.jpg output.jpg --label 207
+> ```
 
 ---
 
@@ -47,7 +53,8 @@ Special thanks to the open-source and academic communities for advancing privacy
 
 ---
 
-*For research and personal privacy protection only. Use responsibly.*
+> [!NOTE]
+> *For research and personal privacy protection only. Use responsibly.*
 
 ---
 
