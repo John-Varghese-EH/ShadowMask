@@ -6,34 +6,64 @@ on:
       - 'v*'  # Triggers on version tags, e.g., v1.0.0
 
 jobs:
-  build:
+  create_release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
+
+  build_and_upload:
+    name: Build and Upload Binaries
+    needs: create_release
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v3
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.10'
+
       - name: Install dependencies
         run: pip install -r requirements.txt
+
       - name: Build executable
         run: |
           pip install pyinstaller
-          pyinstaller src/shadowmask/gui.py --onefile --name shadowmask-${{ matrix.os }}
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: shadowmask-${{ matrix.os }}
-          path: dist/shadowmask-*
+          pyinstaller src/shadowmask/gui.py --onefile --name shadowmask-${{ runner.os }}
 
-  android:
+      - name: Upload release asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: dist/shadowmask-${{ runner.os }}${{ runner.os == 'Windows' && '.exe' || '' }}
+          asset_name: shadowmask-${{ runner.os }}${{ runner.os == 'Windows' && '.exe' || '' }}
+          asset_content_type: application/octet-stream
+
+  build_android:
+    name: Build Android APK
+    needs: create_release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Buildozer
+      - name: Install Buildozer dependencies
         run: |
           sudo apt update
           sudo apt install -y build-essential python3-pip python3-setuptools git python3 python3-pip
@@ -41,32 +71,11 @@ jobs:
       - name: Build APK
         run: buildozer android debug
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: shadowmask-android
-          path: bin/*.apk
-
-  release:
-    needs: [build, android]
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/download-artifact@v3
-        with:
-          name: shadowmask-ubuntu-latest
-          path: ./dist
-      - uses: actions/download-artifact@v3
-        with:
-          name: shadowmask-windows-latest
-          path: ./dist
-      - uses: actions/download-artifact@v3
-        with:
-          name: shadowmask-macos-latest
-          path: ./dist
-      - uses: actions/download-artifact@v3
-        with:
-          name: shadowmask-android
-          path: ./dist
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: ./dist/*
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: bin/*.apk
+          asset_name: shadowmask-android.apk
+          asset_content_type: application/vnd.android.package-archive
