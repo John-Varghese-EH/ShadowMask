@@ -35,7 +35,7 @@ We recommend always using the latest release for security updates.
 
 ## Security Best Practices
 
-- Do not share sensitive or personal data when using ShadowMask.
+- 
 - Always update to the latest version for the most recent security patches.
 - Review and understand third-party dependencies before use.
 
