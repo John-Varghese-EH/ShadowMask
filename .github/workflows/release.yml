@@ -1,0 +1,72 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags, e.g., v1.0.0
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Build executable
+        run: |
+          pip install pyinstaller
+          pyinstaller src/shadowmask/gui.py --onefile --name shadowmask-${{ matrix.os }}
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: shadowmask-${{ matrix.os }}
+          path: dist/shadowmask-*
+
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Buildozer
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential python3-pip python3-setuptools git python3 python3-pip
+          pip install buildozer
+      - name: Build APK
+        run: buildozer android debug
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: shadowmask-android
+          path: bin/*.apk
+
+  release:
+    needs: [build, android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: shadowmask-ubuntu-latest
+          path: ./dist
+      - uses: actions/download-artifact@v3
+        with:
+          name: shadowmask-windows-latest
+          path: ./dist
+      - uses: actions/download-artifact@v3
+        with:
+          name: shadowmask-macos-latest
+          path: ./dist
+      - uses: actions/download-artifact@v3
+        with:
+          name: shadowmask-android
+          path: ./dist
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ./dist/*
