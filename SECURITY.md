@@ -8,7 +8,7 @@ If you discover a security vulnerability in ShadowMask, please help us keep the 
    Please report security issues directly to the project maintainer to allow time for investigation and remediation.
 
 2. **Contact Information:**  
-   - Email: [cybertrinity01@gmail.com]
+   - Email: [cybertrinity01@gmail.com](mailto:cybertrinity01@gmail.com)
    - Or open a private security advisory via [GitHub Security Advisories](https://github.com/John-Varghese-EH/ShadowMask/security/advisories)
 
 3. **Provide Details:**  
