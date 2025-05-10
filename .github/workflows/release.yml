@@ -1,9 +1,12 @@
-name: Build and Release
+name: Build and Release for ShadowMask
 
 on:
   push:
     tags:
       - 'v*'  # Triggers on version tags, e.g., v1.0.0
+
+permissions:
+  contents: write
 
 jobs:
   create_release:
@@ -45,7 +48,7 @@ jobs:
       - name: Build executable
         run: |
           pip install pyinstaller
-          pyinstaller src/shadowmask/gui.py --onefile --name shadowmask-${{ runner.os }}
+          pyinstaller src/shadowmask/gui.py --onefile --name shadowmask-${{ matrix.os }}
 
       - name: Upload release asset
         uses: actions/upload-release-asset@v1
@@ -53,8 +56,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: dist/shadowmask-${{ runner.os }}${{ runner.os == 'Windows' && '.exe' || '' }}
-          asset_name: shadowmask-${{ runner.os }}${{ runner.os == 'Windows' && '.exe' || '' }}
+          asset_path: dist/shadowmask-${{ matrix.os }}${{ matrix.os == 'windows-latest' && '.exe' || '' }}
+          asset_name: shadowmask-${{ matrix.os }}${{ matrix.os == 'windows-latest' && '.exe' || '' }}
           asset_content_type: application/octet-stream
 
   build_android:
@@ -63,13 +66,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Install Buildozer dependencies
         run: |
           sudo apt update
-          sudo apt install -y build-essential python3-pip python3-setuptools git python3 python3-pip
+          sudo apt install -y build-essential python3-pip python3-setuptools git python3
           pip install buildozer
+
       - name: Build APK
         run: buildozer android debug
+
       - name: Upload APK
         uses: actions/upload-release-asset@v1
         env:
