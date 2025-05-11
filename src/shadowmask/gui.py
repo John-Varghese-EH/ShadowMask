@@ -4,30 +4,26 @@ import time
 from datetime import datetime
 from PyQt5.QtWidgets import (
     QApplication, QMainWindow, QWidget, QLabel, QPushButton, QVBoxLayout,
-    QHBoxLayout, QFileDialog, QMessageBox, QProgressBar, QAction, QMenuBar
+    QHBoxLayout, QFileDialog, QMessageBox, QProgressBar, QAction
 )
 from PyQt5.QtGui import QPixmap, QIcon, QFont
 from PyQt5.QtCore import Qt, QThread, pyqtSignal
-
 from .core import alpha_layer_attack, fgsm_attack
 
 REPO_URL = "https://github.com/John-Varghese-EH/ShadowMask"
 
 class Worker(QThread):
-    progress = pyqtSignal(str, int)  # status, percent
-    finished = pyqtSignal(str)       # output file
-
+    progress = pyqtSignal(str, int)
+    finished = pyqtSignal(str)
     def __init__(self, image_path):
         super().__init__()
         self.image_path = image_path
-
     def run(self):
         start_time = time.time()
         self.progress.emit("Running Alpha Layer Attack...", 20)
         alpha_path = alpha_layer_attack(self.image_path)
         self.progress.emit("Alpha Layer Attack done. Running FGSM...", 60)
         fgsm_path = fgsm_attack(alpha_path)
-        # Rename output as required
         dir_, base = os.path.split(self.image_path)
         name, ext = os.path.splitext(base)
         out_path = os.path.join(dir_, f"{name}_ShadowMask-cloaked{ext}")
@@ -40,19 +36,18 @@ class ShadowMaskApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("ShadowMask")
-        self.setWindowIcon(QIcon(os.path.join(os.path.dirname(__file__), "../logo.png")))
+        logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
+        self.setWindowIcon(QIcon(logo_path))
         self.setGeometry(200, 200, 600, 450)
         self.image_path = None
         self.processed_path = None
 
-        # Central widget
         central = QWidget()
         self.setCentralWidget(central)
         vbox = QVBoxLayout()
         vbox.setAlignment(Qt.AlignTop)
 
         # Logo and name
-        logo_path = os.path.join(os.path.dirname(__file__), "../logo.png")
         logo_label = QLabel()
         if os.path.exists(logo_path):
             pixmap = QPixmap(logo_path).scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
@@ -72,7 +67,6 @@ class ShadowMaskApp(QMainWindow):
         self.img_label.setFixedHeight(200)
         vbox.addWidget(self.img_label)
 
-        # Buttons
         btn_box = QHBoxLayout()
         self.select_btn = QPushButton("Select Image")
         self.select_btn.clicked.connect(self.select_image)
@@ -83,7 +77,6 @@ class ShadowMaskApp(QMainWindow):
         btn_box.addWidget(self.process_btn)
         vbox.addLayout(btn_box)
 
-        # Status and time
         self.status_label = QLabel("Select an image to begin.")
         self.status_label.setAlignment(Qt.AlignCenter)
         vbox.addWidget(self.status_label)
@@ -91,14 +84,12 @@ class ShadowMaskApp(QMainWindow):
         self.progress.setValue(0)
         vbox.addWidget(self.progress)
 
-        # Date
         date_label = QLabel(f"Current date: {datetime.now().strftime('%A, %B %d, %Y, %I:%M %p')}")
         date_label.setAlignment(Qt.AlignRight)
         vbox.addWidget(date_label)
 
         central.setLayout(vbox)
 
-        # Menu bar
         menubar = self.menuBar()
         about_menu = menubar.addMenu("About")
         about_action = QAction("About ShadowMask", self)
@@ -150,10 +141,9 @@ class ShadowMaskApp(QMainWindow):
                 "Your Face, Your Rules – Beyond AI’s Reach<br><br>"
                 "Protect your images from unauthorized AI-based facial recognition and scraping.<br>"
                 "<br>"
-                "GitHub: <a href='https://github.com/John-Varghese-EH/ShadowMask'>"
-                "https://github.com/John-Varghese-EH/ShadowMask</a><br>"
+                f"GitHub: <a href='{REPO_URL}'>{REPO_URL}</a><br>"
                 "<br>"
-                "Developed by Cyber_Trinity (J0X) with ❤️"
+                f"Developed by <a href='{REPO_URL}'>Cyber_Trinity (J0X)</a> with ❤️"
             )
         )
 
