@@ -34,7 +34,7 @@ pip install -e .
 
 ## Usage 🎯
 
-### Launch the Modern GUI
+### Launch the GUI
 ```
 python -m shadowmask.gui
 ```
@@ -60,7 +60,7 @@ python src/adversarial_pattern.py input.jpg output.jpg --label 207
 
 ## Run Tests
 ```
-pytest tests/
+pytest
 ```
 
 ---
