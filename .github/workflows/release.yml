@@ -1,41 +1,94 @@
-name: Build and Release for ShadowMask
+name: Build, Test, and Release for ShadowMask
 
 on:
-  push:
-    tags:
-      - 'v*'  # Triggers on version tags, e.g., v1.0.0
+  release:
+    types: [created]
 
 permissions:
   contents: write
+  id-token: write  # Required for trusted PyPI publishing
 
 jobs:
-  create_release:
-    name: Create GitHub Release
-    runs-on: ubuntu-latest
-    outputs:
-      upload_url: ${{ steps.create_release.outputs.upload_url }}
-    steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-          draft: false
-          prerelease: false
-
-  build_and_upload:
-    name: Build and Upload Binaries
-    needs: create_release
+  check:
+    name: Lint, Type Check, and Test
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
+        python-version: ['3.10']
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install system dependencies (Linux)
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libgl1-mesa-glx xvfb
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pytest pytest-qt flake8 mypy
+
+      - name: Lint with flake8
+        run: flake8 src/ tests/
+
+      - name: Type check with mypy
+        run: mypy src/
+
+      - name: Run GUI and unit tests
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: pytest tests/ --cov=src --cov-report=xml
+
+  build_wheels:
+    name: Build PyPI Package
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install build tools
+        run: python -m pip install --upgrade build
+
+      - name: Build wheel and sdist
+        run: python -m build
+
+      - name: Upload dist as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/*
+
+  build_executables:
+    name: Build PyInstaller Executables
+    needs: check
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: shadowmask-linux
+            pyinstaller_name: shadowmask-linux
+          - os: windows-latest
+            artifact_name: shadowmask-windows.exe
+            pyinstaller_name: shadowmask-windows.exe
+          - os: macos-latest
+            artifact_name: shadowmask-macos
+            pyinstaller_name: shadowmask-macos
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -43,45 +96,92 @@ jobs:
           python-version: '3.10'
 
       - name: Install dependencies
-        run: pip install -r requirements.txt
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
 
       - name: Build executable
         run: |
-          pip install pyinstaller
-          pyinstaller src/shadowmask/gui.py --onefile --name shadowmask-${{ matrix.os }}
+          pyinstaller src/shadowmask/gui.py --onefile --name ${{ matrix.pyinstaller_name }}
 
-      - name: Upload release asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Upload executable
+        uses: actions/upload-artifact@v3
         with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: dist/shadowmask-${{ matrix.os }}${{ matrix.os == 'windows-latest' && '.exe' || '' }}
-          asset_name: shadowmask-${{ matrix.os }}${{ matrix.os == 'windows-latest' && '.exe' || '' }}
-          asset_content_type: application/octet-stream
+          name: ${{ matrix.artifact_name }}
+          path: dist/${{ matrix.pyinstaller_name }}
 
   build_android:
     name: Build Android APK
-    needs: create_release
+    needs: check
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
-      - name: Install Buildozer dependencies
+      - name: Install Buildozer and dependencies
         run: |
-          sudo apt update
-          sudo apt install -y build-essential python3-pip python3-setuptools git python3
+          sudo apt-get update
+          sudo apt-get install -y build-essential libffi-dev libssl-dev zlib1g-dev python3-dev openjdk-8-jdk unzip
           pip install buildozer
 
       - name: Build APK
         run: buildozer android debug
 
+      - name: Find APK
+        id: find_apk
+        run: echo "APK_PATH=$(find . -name '*.apk' | head -n 1)" >> $GITHUB_ENV
+
       - name: Upload APK
-        uses: actions/upload-release-asset@v1
+        uses: actions/upload-artifact@v3
+        with:
+          name: shadowmask-android.apk
+          path: ${{ env.APK_PATH }}
+
+  publish_pypi:
+    name: Publish to PyPI
+    needs: [build_wheels]
+    runs-on: ubuntu-latest
+    environment:
+      name: pypi
+      url: https://pypi.org/p/shadowmask
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: dist
+
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: dist/
+
+  github_release:
+    name: Attach Binaries to GitHub Release
+    needs: [build_executables, build_android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          name: shadowmask-linux
+          path: .
+      - uses: actions/download-artifact@v3
+        with:
+          name: shadowmask-windows.exe
+          path: .
+      - uses: actions/download-artifact@v3
+        with:
+          name: shadowmask-macos
+          path: .
+      - uses: actions/download-artifact@v3
+        with:
+          name: shadowmask-android.apk
+          path: .
+
+      - name: Upload assets to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            shadowmask-linux
+            shadowmask-windows.exe
+            shadowmask-macos
+            shadowmask-android.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ needs.create_release.outputs.upload_url }}
-          asset_path: bin/*.apk
-          asset_name: shadowmask-android.apk
-          asset_content_type: application/vnd.android.package-archive
