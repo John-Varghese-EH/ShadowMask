@@ -1,6 +1,6 @@
 PyQt5>=5.15
-pytest
 Pillow
 torch
 torchvision
 numpy
+pytest
