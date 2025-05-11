@@ -10,7 +10,10 @@ ShadowMask is a tool to protect your privacy from unauthorized AI-based facial r
 
 - **Alpha Layer Attack:** Alters the transparency (alpha) channel of PNG images to disrupt AI recognition.
 - **Adversarial Pattern (FGSM):** Adds subtle, targeted noise to images to fool AI facial recognition.
-- **Simple CLI:** Easy-to-use command-line interface.
+- PyQt5 GUI
+- Command-line interface (CLI)
+- Cross-platform (Windows, macOS, Linux)
+- Ready for PyPI
 
 ---
 
@@ -42,6 +45,10 @@ python -m shadowmask.gui
 ```
 shadowmask-gui
 ```
+### Launch the CLI
+```
+shadowmask-cli path/to/image.png --mode both
+```
 
 ### Alpha Layer Attack
 
@@ -70,10 +77,10 @@ pytest
 ShadowMask is inspired by leading research and pioneering privacy tools:
 
 - **AlphaDog (Alpha Channel Attacks):** Based on the AlphaDog method, which exploits the alpha channel to present different content to humans and AI.
-- **Fawkes by SAND Lab, University of Chicago:** [Fawkes](https://sandlab.cs.uchicago.edu/fawkes/) is a groundbreaking image cloaking tool.
 - **Adversarial Pattern Attacks:** Grounded in adversarial machine learning research.
+- **Fawkes by SAND Lab, University of Chicago:** [Fawkes](https://sandlab.cs.uchicago.edu/fawkes/) is a groundbreaking image cloaking tool.
 
-Special thanks to the open-source and academic communities for advancing privacy protection in the age of AI.
+Special thanks to the open-source and academic communities for advancing privacy protection.
 
 ---
 
