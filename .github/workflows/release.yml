@@ -1,55 +1,74 @@
-name: Build, Test, and Release for ShadowMask
+name: Release - ShadowMask
 
 on:
   release:
-    types: [created]
+    types: [published, edited, prereleased]
+
+env:
+  PACKAGE_NAME: "shadowmask"
+  OWNER: "John-Varghese-EH"
 
 permissions:
   contents: write
-  id-token: write  # Required for trusted PyPI publishing
+  id-token: write
 
 jobs:
-  check:
-    name: Lint, Type Check, and Test
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
-        python-version: ['3.10']
+
+  details:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.release.outputs.new_version }}
+      suffix: ${{ steps.release.outputs.suffix }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: ${{ matrix.python-version }}
-
-      - name: Install system dependencies (Linux)
-        if: matrix.os == 'ubuntu-latest'
+      - name: Extract tag and Details
+        id: release
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libgl1-mesa-glx xvfb
+          if [ "${{ github.ref_type }}" = "tag" ]; then
+            TAG_NAME=${GITHUB_REF#refs/tags/}
+            NEW_VERSION=$(echo $TAG_NAME | awk -F'-' '{print $1}')
+            SUFFIX=$(echo $TAG_NAME | grep -oP '[a-z]+[0-9]+' || echo "")
+            echo "new_version=$NEW_VERSION" >> "$GITHUB_OUTPUT"
+            echo "suffix=$SUFFIX" >> "$GITHUB_OUTPUT"
+            echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+            echo "Version is $NEW_VERSION"
+            echo "Suffix is $SUFFIX"
+            echo "Tag name is $TAG_NAME"
+          else
+            echo "No tag found"
+            exit 1
+          fi
 
-      - name: Install dependencies
+  check_pypi:
+    needs: details
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch information from PyPI
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-          pip install pytest pytest-qt flake8 mypy
+          response=$(curl -s https://pypi.org/pypi/${{ env.PACKAGE_NAME }}/json || echo "{}")
+          latest_previous_version=$(echo $response | grep -oP '"releases":\{"\K[^"]+' | sort -rV | head -n 1)
+          if [ -z "$latest_previous_version" ]; then
+            echo "Package not found on PyPI."
+            latest_previous_version="0.0.0"
+          fi
+          echo "Latest version on PyPI: $latest_previous_version"
+          echo "latest_previous_version=$latest_previous_version" >> $GITHUB_ENV
 
-      - name: Lint with flake8
-        run: flake8 src/ tests/
-
-      - name: Type check with mypy
-        run: mypy src/
-
-      - name: Run GUI and unit tests
-        uses: GabrielBB/xvfb-action@v1
-        with:
-          run: pytest tests/ --cov=src --cov-report=xml
+      - name: Compare versions and exit if not newer
+        run: |
+          NEW_VERSION=${{ needs.details.outputs.new_version }}
+          LATEST_VERSION=$latest_previous_version
+          if [ "$(printf '%s\n' "$LATEST_VERSION" "$NEW_VERSION" | sort -rV | head -n 1)" != "$NEW_VERSION" ] || [ "$NEW_VERSION" == "$LATEST_VERSION" ]; then
+            echo "The new version $NEW_VERSION is not greater than the latest version $LATEST_VERSION on PyPI."
+            exit 1
+          else
+            echo "The new version $NEW_VERSION is greater than the latest version $LATEST_VERSION on PyPI."
+          fi
 
   build_wheels:
-    name: Build PyPI Package
-    needs: check
+    needs: [details, check_pypi]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,25 +76,29 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.12"
 
       - name: Install build tools
         run: python -m pip install --upgrade build
 
-      - name: Build wheel and sdist
+      - name: Set project version (if needed)
+        run: |
+          # Optionally update version in pyproject.toml/setup.cfg here
+
+      - name: Build source and wheel distribution
         run: python -m build
 
       - name: Upload dist as artifact
         uses: actions/upload-artifact@v3
         with:
           name: dist
-          path: dist/*
+          path: dist/
 
-  build_executables:
-    name: Build PyInstaller Executables
-    needs: check
+  build_binaries:
+    needs: [details, check_pypi]
     strategy:
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         include:
           - os: ubuntu-latest
             artifact_name: shadowmask-linux
@@ -93,7 +116,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
@@ -111,8 +134,7 @@ jobs:
           path: dist/${{ matrix.pyinstaller_name }}
 
   build_android:
-    name: Build Android APK
-    needs: check
+    needs: [details, check_pypi]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -136,52 +158,68 @@ jobs:
           name: shadowmask-android.apk
           path: ${{ env.APK_PATH }}
 
-  publish_pypi:
-    name: Publish to PyPI
-    needs: [build_wheels]
+  pypi_publish:
+    name: Upload release to PyPI
+    needs: [build_wheels, details]
     runs-on: ubuntu-latest
     environment:
-      name: pypi
-      url: https://pypi.org/p/shadowmask
+      name: release
+    permissions:
+      id-token: write
     steps:
-      - uses: actions/download-artifact@v3
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
         with:
           name: dist
+          path: dist/
 
-      - name: Publish to PyPI
+      - name: Publish distribution to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: dist/
 
   github_release:
-    name: Attach Binaries to GitHub Release
-    needs: [build_executables, build_android]
+    name: Create GitHub Release with Binaries
+    needs: [build_wheels, build_binaries, build_android, details]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
-      - uses: actions/download-artifact@v3
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download dist artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+      - name: Download Linux binary
+        uses: actions/download-artifact@v3
         with:
           name: shadowmask-linux
-          path: .
-      - uses: actions/download-artifact@v3
+          path: dist/
+
+      - name: Download Windows binary
+        uses: actions/download-artifact@v3
         with:
           name: shadowmask-windows.exe
-          path: .
-      - uses: actions/download-artifact@v3
+          path: dist/
+
+      - name: Download macOS binary
+        uses: actions/download-artifact@v3
         with:
           name: shadowmask-macos
-          path: .
-      - uses: actions/download-artifact@v3
+          path: dist/
+
+      - name: Download Android APK
+        uses: actions/download-artifact@v3
         with:
           name: shadowmask-android.apk
-          path: .
+          path: dist/
 
-      - name: Upload assets to GitHub Release
-        uses: softprops/action-gh-release@v1
-        with:
-          files: |
-            shadowmask-linux
-            shadowmask-windows.exe
-            shadowmask-macos
-            shadowmask-android.apk
+      - name: Create GitHub Release
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create ${{ needs.details.outputs.tag_name }} dist/* --title ${{ needs.details.outputs.tag_name }} --generate-notes
