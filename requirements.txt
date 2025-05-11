@@ -1,6 +1,2 @@
-
-kivy
-numpy
-pillow
-torch
-torchvision
+PyQt5>=5.15
+pytest
