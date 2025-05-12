@@ -5,30 +5,45 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  build-appimage:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.12'
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Install AppImage tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y libfuse2
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-setuptools python3-pyqt5 python3-opencv python3-pyqt5.qtquick python3-pyqt5.qtmultimedia libgl1-mesa-glx libglib2.0-0 libsm6 libxext6 libxrender1 libxtst6 libxcb-xinerama0 libxcb-icccm4 libxcb-image0 libxcb-keysyms1 libxcb-render-util0 libxcb-xkb1 libxkbcommon-x11-0
 
-    - name: Build AppImage
-      uses: AppImageCrafters/build-appimage-action@master
-      with:
-        recipe: AppImageBuilder.yml
+      - name: Install AppImageBuilder
+        run: |
+          pip3 install --upgrade appimage-builder
 
-    - name: Upload artifact
-      uses: actions/upload-artifact@v3
-      with:
-        name: shadowmask-${{ github.ref_name }}.AppImage
-        path: *.AppImage
+      - name: Build and test Python package
+        run: |
+          pip3 install -r requirements.txt
+          pip3 install pytest
+          pytest
+
+      - name: Build AppImage
+        uses: AppImageCrafters/build-appimage@master
+        with:
+          recipe: ./AppImageBuilder.yml
+
+      - name: Find AppImage
+        id: find_appimage
+        run: |
+          echo "appimage_path=$(find . -name '*.AppImage' | head -n 1)" >> $GITHUB_OUTPUT
+
+      - name: Upload AppImage to GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: ${{ steps.find_appimage.outputs.appimage_path }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
