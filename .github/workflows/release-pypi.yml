@@ -1,0 +1,51 @@
+name: Release to PyPI (Trusted Publisher)
+
+on:
+  release:
+    types: [published, edited, prereleased]
+
+env:
+  PACKAGE_NAME: "shadowmask"
+
+jobs:
+  build:
+    name: Build distributions
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install build tools
+        run: python -m pip install --upgrade build
+
+      - name: Build sdist and wheel
+        run: python -m build
+
+      - name: Upload dist as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+  publish:
+    name: Publish to PyPI (Trusted Publisher)
+    needs: build
+    runs-on: ubuntu-latest
+    environment: 
+      name: pypi   # This must match the environment name you registered on PyPI
+      url: https://pypi.org/p/shadowmask
+    permissions:
+      id-token: write   # REQUIRED for OIDC Trusted Publishing
+    steps:
+      - name: Download dist artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+      - name: Publish to PyPI via Trusted Publisher
+        uses: pypa/gh-action-pypi-publish@release/v1
