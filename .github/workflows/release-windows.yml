@@ -1,0 +1,50 @@
+# .github/workflows/release-windows.yml
+name: Release Windows EXE
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.12'
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyinstaller
+
+    - name: Build EXE
+      run: |
+        pyinstaller src/shadowmask/gui.py --onefile --name shadowmask-windows
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: shadowmask-${{ github.ref_name }}.exe
+        path: dist/shadowmask-windows.exe
+
+  create-release:
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      
+    steps:
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: shadowmask-${{ github.ref_name }}.exe
+
+    - name: Create Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: shadowmask-${{ github.ref_name }}.exe
