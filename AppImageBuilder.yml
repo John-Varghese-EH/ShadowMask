@@ -1,0 +1,59 @@
+# AppImageBuilder.yml
+version: 1
+script:
+  - pip3 install --upgrade pip
+  - pip3 install -r requirements.txt
+AppDir:
+  path: ./AppDir
+  app_info:
+    id: shadowmask
+    name: ShadowMask
+    icon: src/logo.png
+    version: ${GITHUB_REF_NAME}
+    exec: usr/bin/shadowmask-gui
+    exec_args: ''
+  runtime:
+    env:
+      PYTHONPATH: usr/lib/python3.12/site-packages
+      QT_QPA_PLATFORM: xcb
+  files:
+    include:
+      - src/
+      - logo.png
+      - requirements.txt
+  apt:
+    packages:
+      - python3
+      - python3-pyqt5
+      - python3-opencv
+      - python3-pip
+      - python3-setuptools
+      - python3-numpy
+      - python3-pyqt5.qtquick
+      - python3-pyqt5.qtmultimedia
+      - libgl1-mesa-glx
+      - libglib2.0-0
+      - libsm6
+      - libxext6
+      - libxrender1
+      - libxtst6
+      - libxcb-xinerama0
+      - libxcb-icccm4
+      - libxcb-image0
+      - libxcb-keysyms1
+      - libxcb-render-util0
+      - libxcb-xkb1
+      - libxkbcommon-x11-0
+  python:
+    packages:
+      - pyqt5
+      - opencv-python
+      - numpy
+      - pillow
+      - torch
+      - torchvision
+      - pytest
+  wrapper:
+    path: usr/bin/shadowmask-gui
+    interpreter: python3
+    script: src/shadowmask/gui.py
