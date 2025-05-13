@@ -1,46 +1,187 @@
-name: Release
+name: Release ShadowMask
 
 on:
   push:
     tags:
       - 'v*'
 
-jobs:
-  build-and-publish:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write  # Required for trusted publishing
+env:
+  PACKAGE_NAME: "shadowmask"
+  OWNER: "John-Varghese-EH"
 
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  version_check:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag_name: ${{ steps.version.outputs.tag_name }}
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: '3.11'
+      - uses: actions/checkout@v4
+      
+      - name: Extract version from tag
+        id: version
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          VERSION=${TAG_NAME#v}
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "tag_name=$TAG_NAME" >> "$GITHUB_OUTPUT"
+          echo "Version: $VERSION"
+          echo "Tag: $TAG_NAME"
+
+  check_pypi:
+    needs: version_check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check PyPI version
+        run: |
+          response=$(curl -s https://pypi.org/pypi/${{ env.PACKAGE_NAME }}/json || echo "{}")
+          latest_version=$(echo $response | grep -oP '"releases":\{"\K[^"]+' | sort -rV | head -n 1)
+          if [ -z "$latest_version" ]; then
+            echo "Package not found on PyPI. This will be the first release."
+            exit 0
+          fi
+          echo "Latest PyPI version: $latest_version"
+          if [ "$(printf '%s\n' "$latest_version" "${{ needs.version_check.outputs.version }}" | sort -rV | head -n 1)" != "${{ needs.version_check.outputs.version }}" ]; then
+            echo "Error: New version ${{ needs.version_check.outputs.version }} is not greater than PyPI version $latest_version"
+            exit 1
+          fi
+
+  build_package:
+    needs: [version_check, check_pypi]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+          
+      - name: Install build dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install build twine
+          
+      - name: Build package
+        run: python -m build
         
-    - name: Install build dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install build
+      - name: Check package
+        run: twine check dist/*
         
-    - name: Build package
-      run: |
-        python -m build
+      - name: Upload dist as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist
+          path: dist/
+
+  build_executables:
+    needs: [version_check, check_pypi]
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            artifact_name: shadowmask-linux
+            pyinstaller_name: shadowmask-linux
+          - os: windows-latest
+            artifact_name: shadowmask-windows
+            pyinstaller_name: shadowmask-windows.exe
+          - os: macos-latest
+            artifact_name: shadowmask-macos
+            pyinstaller_name: shadowmask-macos
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt pyinstaller
+          
+      - name: Build executable
+        run: |
+          pyinstaller src/shadowmask/gui.py --onefile --name ${{ matrix.pyinstaller_name }}
+          
+      - name: Upload executable
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: dist/${{ matrix.pyinstaller_name }}
+
+  build_android:
+    needs: [version_check, check_pypi]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Install Buildozer dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential libffi-dev libssl-dev zlib1g-dev python3-dev openjdk-8-jdk unzip
+          pip install buildozer
+          
+      - name: Build APK
+        run: buildozer android debug
         
-    - name: Check package
-      run: |
-        pip install twine
-        twine check dist/*
-        
-    - name: Publish to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
-        
-    - name: Create GitHub Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: |
-          dist/*
-        generate_release_notes: true
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Find and upload APK
+        run: |
+          APK_PATH=$(find . -name '*.apk' | head -n 1)
+          if [ -z "$APK_PATH" ]; then
+            echo "No APK found"
+            exit 1
+          fi
+          echo "Found APK at: $APK_PATH"
+          
+      - name: Upload APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: shadowmask-android.apk
+          path: $APK_PATH
+
+  publish_pypi:
+    needs: [build_package, version_check]
+    runs-on: ubuntu-latest
+    environment:
+      name: release
+    steps:
+      - name: Download dist artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: dist
+          path: dist/
+          
+      - name: Publish to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
+          username: ${{ secrets.PYPI_USERNAME }}
+
+  create_release:
+    needs: [build_package, build_executables, build_android, version_check]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: dist/
+          
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ needs.version_check.outputs.tag_name }}
+          files: |
+            dist/*
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
