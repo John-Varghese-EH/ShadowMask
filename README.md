@@ -177,3 +177,7 @@ Your feedback is appreciated!
     <img src="https://img.shields.io/badge/Patreon-F96854?style=for-the-badge&logo=patreon&logoColor=white" />
   </a>
 </p>
+
+---
+
+<a href="https://github.com/John-Varghese-EH/ShadowMask">ShadowMask</a> © 2025 by <a href="https://www.linkedin.com/in/john--varghese/">John Varghese (@Cyber_Trinity) J0X</a>
