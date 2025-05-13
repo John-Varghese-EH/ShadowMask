@@ -1,3 +1,14 @@
-include README.md
 include LICENSE
-recursive-include src/shadowmask *.png
+include README.md
+include requirements.txt
+include pyproject.toml
+include setup.cfg
+
+recursive-include src/shadowmask *.py
+recursive-include tests *.py
+
+global-exclude *.pyc
+global-exclude *.pyo
+global-exclude *.pyd
+global-exclude __pycache__
+global-exclude *.so
