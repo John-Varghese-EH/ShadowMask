@@ -1,157 +1,301 @@
+"""
+GUI for ShadowMask using PyQt5
+"""
+
 import sys
 import os
-import time
-from datetime import datetime
 from PyQt5.QtWidgets import (
-    QApplication, QMainWindow, QWidget, QLabel, QPushButton, QVBoxLayout,
-    QHBoxLayout, QFileDialog, QMessageBox, QProgressBar, QAction
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QPushButton, QLabel, QFileDialog, QCheckBox, QSlider,
+    QProgressBar, QMessageBox, QGroupBox, QScrollArea
 )
-from PyQt5.QtGui import QPixmap, QIcon, QFont
-from PyQt5.QtCore import Qt, QThread, pyqtSignal
-from .core import alpha_layer_attack, fgsm_attack
+from PyQt5.QtCore import Qt, QThread, pyqtSignal, QSize
+from PyQt5.QtGui import QPixmap, QImage, QIcon, QMovie
+from .core import ShadowMask
+from .banner import BANNER, ABOUT
 
-REPO_URL = "https://github.com/John-Varghese-EH/ShadowMask"
-
-class Worker(QThread):
-    progress = pyqtSignal(str, int)
+class WorkerThread(QThread):
+    """Worker thread for image processing"""
+    progress = pyqtSignal(int)
     finished = pyqtSignal(str)
-    def __init__(self, image_path):
+    error = pyqtSignal(str)
+    
+    def __init__(self, image_path, output_path, methods, intensity):
         super().__init__()
         self.image_path = image_path
+        self.output_path = output_path
+        self.methods = methods
+        self.intensity = intensity
+        
     def run(self):
-        start_time = time.time()
-        self.progress.emit("Running Alpha Layer Attack...", 20)
-        alpha_path = alpha_layer_attack(self.image_path)
-        self.progress.emit("Alpha Layer Attack done. Running FGSM...", 60)
-        fgsm_path = fgsm_attack(alpha_path)
-        dir_, base = os.path.split(self.image_path)
-        name, ext = os.path.splitext(base)
-        out_path = os.path.join(dir_, f"{name}_ShadowMask-cloaked{ext}")
-        os.replace(fgsm_path, out_path)
-        elapsed = time.time() - start_time
-        self.progress.emit(f"Done in {elapsed:.1f}s", 100)
-        self.finished.emit(out_path)
+        try:
+            shadowmask = ShadowMask()
+            shadowmask.protect_image(
+                self.image_path,
+                methods=self.methods,
+                output_path=self.output_path,
+                intensity=self.intensity
+            )
+            self.finished.emit(self.output_path)
+        except Exception as e:
+            self.error.emit(str(e))
 
 class ShadowMaskApp(QMainWindow):
+    """Main application window"""
+    
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("ShadowMask")
-        logo_path = os.path.join(os.path.dirname(__file__), "logo.png")
-        self.setWindowIcon(QIcon(logo_path))
-        self.setGeometry(200, 200, 600, 450)
-        self.image_path = None
-        self.processed_path = None
-
-        central = QWidget()
-        self.setCentralWidget(central)
-        vbox = QVBoxLayout()
-        vbox.setAlignment(Qt.AlignTop)
-
-        # Logo and name
-        logo_label = QLabel()
-        if os.path.exists(logo_path):
-            pixmap = QPixmap(logo_path).scaled(64, 64, Qt.KeepAspectRatio, Qt.SmoothTransformation)
-            logo_label.setPixmap(pixmap)
-        name_label = QLabel("ShadowMask")
-        name_label.setFont(QFont("Arial", 24, QFont.Bold))
-        name_label.setAlignment(Qt.AlignCenter)
-        logo_name_box = QHBoxLayout()
-        logo_name_box.addWidget(logo_label)
-        logo_name_box.addWidget(name_label)
-        logo_name_box.addStretch()
-        vbox.addLayout(logo_name_box)
-
+        self.init_ui()
+        
+    def init_ui(self):
+        """Initialize the user interface"""
+        self.setWindowTitle("ShadowMask - Your Face, Your Rules")
+        self.setMinimumSize(1000, 800)
+        
+        # Create central widget and layout
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        layout = QVBoxLayout(central_widget)
+        
+        # Logo and title
+        logo_group = QGroupBox()
+        logo_layout = QHBoxLayout()
+        
+        # Load and display animated logo
+        self.logo_label = QLabel()
+        self.logo_movie = QMovie(os.path.join(os.path.dirname(__file__), "logo.gif"))
+        self.logo_movie.setScaledSize(QSize(100, 100))
+        self.logo_label.setMovie(self.logo_movie)
+        self.logo_movie.start()
+        
+        title_label = QLabel("ShadowMask")
+        title_label.setStyleSheet("font-size: 24px; font-weight: bold;")
+        
+        logo_layout.addWidget(self.logo_label)
+        logo_layout.addWidget(title_label)
+        logo_layout.addStretch()
+        logo_group.setLayout(logo_layout)
+        layout.addWidget(logo_group)
+        
         # Image preview
-        self.img_label = QLabel()
-        self.img_label.setAlignment(Qt.AlignCenter)
-        self.img_label.setFixedHeight(200)
-        vbox.addWidget(self.img_label)
-
-        btn_box = QHBoxLayout()
+        preview_group = QGroupBox("Image Preview")
+        preview_layout = QVBoxLayout()
+        self.preview_label = QLabel()
+        self.preview_label.setAlignment(Qt.AlignCenter)
+        self.preview_label.setMinimumSize(400, 300)
+        self.preview_label.setStyleSheet("border: 2px dashed #ccc;")
+        preview_layout.addWidget(self.preview_label)
+        preview_group.setLayout(preview_layout)
+        layout.addWidget(preview_group)
+        
+        # Controls
+        controls_group = QGroupBox("Controls")
+        controls_layout = QVBoxLayout()
+        
+        # File selection
+        file_layout = QHBoxLayout()
         self.select_btn = QPushButton("Select Image")
         self.select_btn.clicked.connect(self.select_image)
-        btn_box.addWidget(self.select_btn)
-        self.process_btn = QPushButton("Run ShadowMask Cloak")
-        self.process_btn.setEnabled(False)
-        self.process_btn.clicked.connect(self.run_processing)
-        btn_box.addWidget(self.process_btn)
-        vbox.addLayout(btn_box)
-
-        self.status_label = QLabel("Select an image to begin.")
-        self.status_label.setAlignment(Qt.AlignCenter)
-        vbox.addWidget(self.status_label)
-        self.progress = QProgressBar()
-        self.progress.setValue(0)
-        vbox.addWidget(self.progress)
-
-        date_label = QLabel(f"Current date: {datetime.now().strftime('%A, %B %d, %Y, %I:%M %p')}")
-        date_label.setAlignment(Qt.AlignRight)
-        vbox.addWidget(date_label)
-
-        central.setLayout(vbox)
-
-        menubar = self.menuBar()
-        about_menu = menubar.addMenu("About")
-        about_action = QAction("About ShadowMask", self)
-        about_action.triggered.connect(self.show_about)
-        about_menu.addAction(about_action)
-
+        file_layout.addWidget(self.select_btn)
+        controls_layout.addLayout(file_layout)
+        
+        # Protection methods
+        method_group = QGroupBox("Protection Methods")
+        method_layout = QVBoxLayout()
+        self.method_checkboxes = {
+            'alpha_layer': QCheckBox("Alpha Layer Attack"),
+            'adversarial': QCheckBox("Adversarial Pattern"),
+            'encoder': QCheckBox("Encoder Attack"),
+            'diffusion': QCheckBox("Diffusion Attack")
+        }
+        for checkbox in self.method_checkboxes.values():
+            method_layout.addWidget(checkbox)
+        method_group.setLayout(method_layout)
+        controls_layout.addWidget(method_group)
+        
+        # Intensity slider
+        intensity_layout = QHBoxLayout()
+        intensity_layout.addWidget(QLabel("Protection Intensity:"))
+        self.intensity_slider = QSlider(Qt.Horizontal)
+        self.intensity_slider.setMinimum(0)
+        self.intensity_slider.setMaximum(100)
+        self.intensity_slider.setValue(50)
+        self.intensity_slider.setTickPosition(QSlider.TicksBelow)
+        intensity_layout.addWidget(self.intensity_slider)
+        controls_layout.addLayout(intensity_layout)
+        
+        # Protect button
+        button_layout = QHBoxLayout()
+        self.protect_btn = QPushButton("Protect Image")
+        self.protect_btn.clicked.connect(self.protect_image)
+        self.protect_btn.setEnabled(False)
+        button_layout.addWidget(self.protect_btn)
+        controls_layout.addLayout(button_layout)
+        
+        controls_group.setLayout(controls_layout)
+        layout.addWidget(controls_group)
+        
+        # About section
+        about_group = QGroupBox("About")
+        about_layout = QVBoxLayout()
+        about_text = QLabel(ABOUT)
+        about_text.setWordWrap(True)
+        about_text.setOpenExternalLinks(True)
+        about_layout.addWidget(about_text)
+        about_group.setLayout(about_layout)
+        layout.addWidget(about_group)
+        
+        # Progress bar
+        self.progress_bar = QProgressBar()
+        self.progress_bar.setVisible(False)
+        layout.addWidget(self.progress_bar)
+        
+        # Status bar
+        self.statusBar().showMessage("Ready")
+        
+        self.current_image = None
+        
     def select_image(self):
-        file_path, _ = QFileDialog.getOpenFileName(
-            self, "Select Image", "", "Images (*.png *.jpg *.jpeg *.bmp)"
+        """Handle image selection"""
+        file_name, _ = QFileDialog.getOpenFileName(
+            self,
+            "Select Image",
+            "",
+            "Image Files (*.png *.jpg *.jpeg *.bmp *.gif)"
         )
-        if file_path:
-            self.image_path = file_path
-            pixmap = QPixmap(file_path)
-            self.img_label.setPixmap(pixmap.scaled(400, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-            self.status_label.setText(f"Loaded: {os.path.basename(file_path)}")
-            self.process_btn.setEnabled(True)
-            self.progress.setValue(0)
-
-    def run_processing(self):
-        if not self.image_path:
-            QMessageBox.warning(self, "No Image", "Please select an image first.")
+        
+        if file_name:
+            try:
+                self.current_image = file_name
+                pixmap = QPixmap(file_name)
+                if pixmap.isNull():
+                    raise ValueError("Failed to load image")
+                    
+                scaled_pixmap = pixmap.scaled(
+                    self.preview_label.size(),
+                    Qt.KeepAspectRatio,
+                    Qt.SmoothTransformation
+                )
+                self.preview_label.setPixmap(scaled_pixmap)
+                self.protect_btn.setEnabled(True)
+                self.statusBar().showMessage(f"Selected: {os.path.basename(file_name)}")
+            except Exception as e:
+                QMessageBox.critical(
+                    self,
+                    "Error",
+                    f"Failed to load image: {str(e)}"
+                )
+                self.current_image = None
+                self.protect_btn.setEnabled(False)
+            
+    def protect_image(self):
+        """Handle image protection"""
+        if not self.current_image:
             return
-        self.status_label.setText("Processing...")
-        self.progress.setValue(10)
-        self.process_btn.setEnabled(False)
-        self.worker = Worker(self.image_path)
-        self.worker.progress.connect(self.update_status)
-        self.worker.finished.connect(self.processing_done)
-        self.worker.start()
-
-    def update_status(self, status, percent):
-        self.status_label.setText(status)
-        self.progress.setValue(percent)
-
-    def processing_done(self, out_path):
-        self.processed_path = out_path
-        self.status_label.setText(f"Saved: {os.path.basename(out_path)}")
-        pixmap = QPixmap(out_path)
-        self.img_label.setPixmap(pixmap.scaled(400, 200, Qt.KeepAspectRatio, Qt.SmoothTransformation))
-        self.progress.setValue(100)
-        self.process_btn.setEnabled(True)
-        QMessageBox.information(self, "Done", f"Image processed and saved as:\n{out_path}")
-
-    def show_about(self):
-        QMessageBox.information(
-            self, "About ShadowMask",
-            (
-                "<b>ShadowMask</b><br>"
-                "Your Face, Your Rules – Beyond AI’s Reach<br><br>"
-                "Protect your images from unauthorized AI-based facial recognition and scraping.<br>"
-                "<br>"
-                f"GitHub: <a href='{REPO_URL}'>{REPO_URL}</a><br>"
-                "<br>"
-                f"Developed by <a href='{REPO_URL}'>Cyber_Trinity (J0X)</a> with ❤️"
+            
+        # Get output path
+        output_path, _ = QFileDialog.getSaveFileName(
+            self,
+            "Save Protected Image",
+            "",
+            "PNG Files (*.png)"
+        )
+        
+        if not output_path:
+            return
+            
+        # Get selected methods
+        methods = [
+            method for method, checkbox in self.method_checkboxes.items()
+            if checkbox.isChecked()
+        ]
+        
+        if not methods:
+            QMessageBox.warning(
+                self,
+                "Warning",
+                "Please select at least one protection method"
             )
+            return
+        
+        # Get intensity
+        intensity = self.intensity_slider.value() / 100.0
+        
+        # Create and start worker thread
+        self.worker = WorkerThread(
+            self.current_image,
+            output_path,
+            methods,
+            intensity
+        )
+        self.worker.finished.connect(self.protection_finished)
+        self.worker.error.connect(self.protection_error)
+        
+        # Update UI
+        self.progress_bar.setVisible(True)
+        self.progress_bar.setRange(0, 0)  # Indeterminate progress
+        self.protect_btn.setEnabled(False)
+        self.select_btn.setEnabled(False)
+        self.statusBar().showMessage("Protecting image...")
+        
+        self.worker.start()
+        
+    def protection_finished(self, output_path):
+        """Handle protection completion"""
+        self.progress_bar.setVisible(False)
+        self.protect_btn.setEnabled(True)
+        self.select_btn.setEnabled(True)
+        self.statusBar().showMessage(f"Protected image saved: {os.path.basename(output_path)}")
+        
+        try:
+            # Show preview of protected image
+            pixmap = QPixmap(output_path)
+            if pixmap.isNull():
+                raise ValueError("Failed to load protected image")
+                
+            scaled_pixmap = pixmap.scaled(
+                self.preview_label.size(),
+                Qt.KeepAspectRatio,
+                Qt.SmoothTransformation
+            )
+            self.preview_label.setPixmap(scaled_pixmap)
+            
+            QMessageBox.information(
+                self,
+                "Success",
+                "Image has been protected successfully!"
+            )
+        except Exception as e:
+            QMessageBox.warning(
+                self,
+                "Warning",
+                f"Image was protected but preview failed: {str(e)}"
+            )
+        
+    def protection_error(self, error_msg):
+        """Handle protection error"""
+        self.progress_bar.setVisible(False)
+        self.protect_btn.setEnabled(True)
+        self.select_btn.setEnabled(True)
+        self.statusBar().showMessage("Error occurred")
+        
+        QMessageBox.critical(
+            self,
+            "Error",
+            f"Failed to protect image: {error_msg}"
         )
 
-def main():
+def run():
+    """Run the application"""
     app = QApplication(sys.argv)
     window = ShadowMaskApp()
     window.show()
+    
+    # Show banner in message box
+    QMessageBox.information(
+        window,
+        "Welcome to ShadowMask",
+        f"{BANNER}\n{ABOUT}"
+    )
+    
     sys.exit(app.exec_())
-
-if __name__ == "__main__":
-    main()
