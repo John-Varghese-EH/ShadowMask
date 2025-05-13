@@ -1,6 +1,17 @@
+"""
+Core functionality for ShadowMask
+"""
+
 import os
 from PIL import Image
 import numpy as np
+from typing import Union, List, Optional
+from .attacks import (
+    AlphaLayerAttack,
+    AdversarialPattern,
+    EncoderAttack,
+    DiffusionAttack
+)
 
 # FGSM requires torch and torchvision
 import torch
@@ -90,6 +101,99 @@ def fgsm_attack(input_path, epsilon=2/255, label=None, model=None, device=None):
     output_path = _output_path(input_path)
     img_adv_pil.save(output_path)
     return output_path
+
+class ShadowMask:
+    """Main class for ShadowMask functionality"""
+    
+    def __init__(self):
+        self.alpha_attack = AlphaLayerAttack()
+        self.adversarial_pattern = AdversarialPattern()
+        self.encoder_attack = EncoderAttack()
+        self.diffusion_attack = DiffusionAttack()
+        
+    def protect_image(
+        self,
+        image_path: Union[str, Image.Image],
+        methods: Optional[List[str]] = None,
+        output_path: Optional[str] = None,
+        intensity: float = 0.5
+    ) -> Image.Image:
+        """
+        Protect an image using specified methods
+        
+        Args:
+            image_path: Path to image or PIL Image object
+            methods: List of protection methods to apply
+            output_path: Path to save protected image
+            intensity: Protection intensity (0.0 to 1.0)
+            
+        Returns:
+            Protected PIL Image
+        """
+        if methods is None:
+            methods = ['alpha_layer', 'adversarial']
+            
+        if isinstance(image_path, str):
+            image = Image.open(image_path)
+        else:
+            image = image_path
+            
+        protected_image = image.copy()
+        
+        for method in methods:
+            if method == 'alpha_layer':
+                protected_image = self.alpha_attack.apply(protected_image, intensity)
+            elif method == 'adversarial':
+                protected_image = self.adversarial_pattern.apply(protected_image, intensity)
+            elif method == 'encoder':
+                protected_image = self.encoder_attack.apply(protected_image, intensity)
+            elif method == 'diffusion':
+                protected_image = self.diffusion_attack.apply(protected_image, intensity)
+                
+        # Add DMI-PROHIBITED metadata
+        protected_image.info['DMI-PROHIBITED'] = 'true'
+        
+        if output_path:
+            protected_image.save(output_path, 'PNG')
+            
+        return protected_image
+    
+    def batch_protect(
+        self,
+        input_dir: str,
+        output_dir: str,
+        methods: Optional[List[str]] = None,
+        intensity: float = 0.5
+    ) -> List[str]:
+        """
+        Protect multiple images in a directory
+        
+        Args:
+            input_dir: Directory containing images to protect
+            output_dir: Directory to save protected images
+            methods: List of protection methods to apply
+            intensity: Protection intensity (0.0 to 1.0)
+            
+        Returns:
+            List of paths to protected images
+        """
+        os.makedirs(output_dir, exist_ok=True)
+        protected_paths = []
+        
+        for filename in os.listdir(input_dir):
+            if filename.lower().endswith(('.png', '.jpg', '.jpeg')):
+                input_path = os.path.join(input_dir, filename)
+                output_path = os.path.join(output_dir, f'protected_{filename}')
+                
+                self.protect_image(
+                    input_path,
+                    methods=methods,
+                    output_path=output_path,
+                    intensity=intensity
+                )
+                protected_paths.append(output_path)
+                
+        return protected_paths
 
 # Optional: CLI for quick testing
 if __name__ == "__main__":
