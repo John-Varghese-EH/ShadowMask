@@ -1,0 +1,93 @@
+name: Build Executables
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+        pip install pyinstaller
+        
+    - name: Build Windows executable
+      run: |
+        pyinstaller --onefile --windowed --icon=src/shadowmask/assets/icon.ico --name ShadowMask src/shadowmask/gui.py
+        
+    - name: Upload Windows executable
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/ShadowMask.exe
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+        pip install pyinstaller
+        sudo apt-get update
+        sudo apt-get install -y libgl1-mesa-dev
+        
+    - name: Build Linux AppImage
+      run: |
+        pyinstaller --onefile --windowed --icon=src/shadowmask/assets/icon.png --name ShadowMask src/shadowmask/gui.py
+        appimage-builder --recipe appimage/AppImageBuilder.yml
+        
+    - name: Upload Linux AppImage
+      uses: softprops/action-gh-release@v1
+      with:
+        files: ShadowMask-*.AppImage
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+        
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -e ".[dev]"
+        pip install pyinstaller
+        
+    - name: Build macOS DMG
+      run: |
+        pyinstaller --onefile --windowed --icon=src/shadowmask/assets/icon.icns --name ShadowMask src/shadowmask/gui.py
+        create-dmg dist/ShadowMask.app
+        
+    - name: Upload macOS DMG
+      uses: softprops/action-gh-release@v1
+      with:
+        files: dist/ShadowMask.dmg
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
