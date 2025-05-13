@@ -1,4 +1,4 @@
-# ShadowMask
+# ShadowMask 🎭
 
 **Your Face, Your Rules – Beyond AI’s Reach ✨**
 
@@ -8,84 +8,154 @@ ShadowMask is a tool to protect your privacy from unauthorized AI-based facial r
 
 ## Features 🚀
 
-- **Alpha Layer Attack:** Alters the transparency (alpha) channel of PNG images to disrupt AI recognition.
-- **Adversarial Pattern (FGSM):** Adds subtle, targeted noise to images to fool AI facial recognition.
-- PyQt5 GUI
-- Command-line interface (CLI)
-- Cross-platform (Windows, macOS, Linux)
-- Ready for PyPI
+- **Multiple Protection Methods**:
+  - Alpha Layer Attack: Manipulates PNG transparency layers
+  - Adversarial Pattern: Creates random cosmetic distortions
+  - Encoder Attack: Embeds metadata to signal AI scrapers
+  - Diffusion Attack: Applies subtle noise patterns
+
+- **User-Friendly Interfaces**:
+  - Modern PyQt5 GUI with real-time preview
+  - Command-line interface for batch processing
+  - Cross-platform support (Windows, Linux, macOS)
 
 ---
 
 ## Installation 🛠️
 
-### Clone the repository
-```
+### Windows
+1. Download the latest `.exe` installer from [Releases](https://github.com/John-Varghese-EH/ShadowMask/releases)
+2. Run the installer and follow the setup wizard
+3. Launch ShadowMask from the Start Menu
+
+### Linux
+1. Download the latest `.AppImage` from [Releases](https://github.com/John-Varghese-EH/ShadowMask/releases)
+2. Make it executable:
+   ```bash
+   chmod +x ShadowMask-*.AppImage
+   ```
+3. Run the AppImage:
+   ```bash
+   ./ShadowMask-*.AppImage
+   ```
+
+### macOS
+1. Download the latest `.dmg` from [Releases](https://github.com/John-Varghese-EH/ShadowMask/releases)
+2. Mount the DMG and drag ShadowMask to Applications
+3. Launch from Applications or Spotlight
+
+### From Source
+```bash
+# Clone the repository
 git clone https://github.com/John-Varghese-EH/ShadowMask.git
 cd ShadowMask
-```
 
-### Install dependencies
-```
-pip install -r requirements.txt
-```
+# Create and activate virtual environment
+python -m venv venv
+source venv/bin/activate  # Linux/macOS
+venv\Scripts\activate     # Windows
 
-### (Optional) Install as an editable package for CLI use
+# Install dependencies
+pip install -e ".[dev]"
 ```
-pip install -e .
-```
+---
 
 ## Usage 🎯
 
-### Launch the GUI
-```
-python -m shadowmask.gui
-```
-### or, if installed as a package:
-```
-shadowmask-gui
-```
-### Launch the CLI
-```
-shadowmask-cli path/to/image.png --mode both
+### GUI Interface
+1. Launch ShadowMask:
+   ```bash
+   shadowmask-gui
+   ```
+2. Click "Select Image" to choose an image
+3. Select protection methods and adjust intensity
+4. Click "Protect Image" to process
+5. Save the protected image
+
+### Command Line
+```bash
+# Basic usage
+shadowmask input.jpg -o output.png -m all -i 0.7
+
+# Options
+-m, --methods    Protection methods (all, alpha, pattern, encoder, diffusion)
+-i, --intensity  Protection intensity (0.1-1.0)
+-o, --output     Output file path
+-v, --verbose    Show detailed progress
 ```
 
-### Alpha Layer Attack
-
+### Batch Processing
+```bash
+# Process all images in a directory
+shadowmask input_dir/ -o output_dir/ -m all -i 0.7
 ```
-python src/alpha_attack.py visible_image.png ai_image.png output.png --preview
-```
+---
+## Protection Methods
 
+1. **Alpha Layer Attack**
+   - Manipulates PNG transparency layers
+   - Preserves image quality while confusing AI
+   - Works best with PNG images
 
-### Adversarial Pattern (FGSM)
+2. **Adversarial Pattern**
+   - Creates random cosmetic distortions
+   - Maintains human perception
+   - Effective against most AI systems
 
-```
-python src/adversarial_pattern.py input.jpg output.jpg --label 207
-```
+3. **Encoder Attack**
+   - Embeds metadata to signal AI scrapers
+   - Adds DMI-PROHIBITED flag
+   - Helps prevent unauthorized scraping
+
+4. **Diffusion Attack**
+   - Applies subtle noise patterns
+   - Confuses AI recognition
+   - Minimal visual impact
 
 ---
 
-## Run Tests
-```
+## Development 🧑🏻‍💻
+
+### Setup
+```bash
+# Install development dependencies
+pip install -e ".[dev]"
+
+# Run tests
 pytest
+
+# Check code style
+black src/ tests/
+flake8 src/ tests/
 ```
 
----
+### Building
+```bash
+# Build package
+python -m build
 
-## Inspiration & Credits 🙏
-
-ShadowMask is inspired by leading research and pioneering privacy tools:
-
-- **AlphaDog (Alpha Channel Attacks):** Based on the AlphaDog method, which exploits the alpha channel to present different content to humans and AI.
-- **Adversarial Pattern Attacks:** Grounded in adversarial machine learning research.
-- **Fawkes by SAND Lab, University of Chicago:** [Fawkes](https://sandlab.cs.uchicago.edu/fawkes/) is a groundbreaking image cloaking tool.
-
-Special thanks to the open-source and academic communities for advancing privacy protection.
+# Build executables
+pyinstaller --onefile --windowed src/shadowmask/gui.py
+```
 
 ---
 
 > [!NOTE]
-> *⚠️ For research and personal privacy protection only. Use responsibly.*
+> *⚠️ This tool is for research and personal privacy protection only. Use responsibly.*
+
+---
+## Contributing 🫂
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+
+## Support
+
+- Report issues on [GitHub Issues](https://github.com/John-Varghese-EH/ShadowMask/issues)
 
 ---
 
