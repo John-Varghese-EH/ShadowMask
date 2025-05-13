@@ -152,18 +152,13 @@ pyinstaller --onefile --windowed src/shadowmask/gui.py
 4. Run tests and linting
 5. Submit a pull request
 
-
-## Support
-
-- Report issues on [GitHub Issues](https://github.com/John-Varghese-EH/ShadowMask/issues)
-
 ---
 
 ## Suggestions & Feedback 💡
 
 Have ideas or want to help improve this project?
 
-> - Open an issue  
+> - Report issues on [GitHub Issues](https://github.com/John-Varghese-EH/ShadowMask/issues)
 > - Start a discussion  
 > - Or email me at [cybertrinity01@gmail.com](mailto:cybertrinity01@gmail.com)  
 
