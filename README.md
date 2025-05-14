@@ -4,8 +4,6 @@
 
 ShadowMask is a tool to protect your privacy from unauthorized AI-based facial recognition and image scraping. It lets you cloak your images using Alpha Layer Attacks and Adversarial Patterns, making your photos appear normal to humans but confusing or unreadable to AI systems.
 
-<img src="https://2no.co/1OSnJ.png">
-
 ![ShadowMask-App](/docs/ShadowMask_app.png)
 
 ---
