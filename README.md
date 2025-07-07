@@ -11,6 +11,13 @@ ShadowMask is a tool to protect your privacy from unauthorized AI-based facial r
 
 ---
 
+> [!NOTE]
+> **🚧 Work in Progress:**  
+> ShadowMask is still evolving! Help make it better and faster—contributions, feedback, and ideas are warmly welcome.  
+> *Star the repo and join the project!*
+
+---
+
 ## Features 🚀
 
 - **Multiple Protection Methods**:
