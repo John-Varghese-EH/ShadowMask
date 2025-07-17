@@ -1,0 +1,1431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShadowMask - Protect Your Images from AI Recognition</title>
+    <meta name="description" content="ShadowMask is a tool to protect your privacy from unauthorised AI-based facial recognition and image scraping using Alpha Layer Attacks and Adversarial Patterns.">
+    <meta name="keywords" content="AI protection, facial recognition, privacy, image protection, adversarial attacks">
+    <meta name="author" content="John Varghese">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://john-varghese-eh.github.io/ShadowMask-Website/">
+    <meta property="og:title" content="ShadowMask - Protect Your Images from AI Recognition">
+    <meta property="og:description" content="Your Face, Your Rules – Beyond AI's Reach ✨">
+    <meta property="og:image" content="https://john-varghese-eh.github.io/ShadowMask-Website/assets/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://john-varghese-eh.github.io/ShadowMask-Website/">
+    <meta property="twitter:title" content="ShadowMask - Protect Your Images from AI Recognition">
+    <meta property="twitter:description" content="Your Face, Your Rules – Beyond AI's Reach ✨">
+    <meta property="twitter:image" content="https://john-varghese-eh.github.io/ShadowMask-Website/assets/og-image.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%235D3FD3'><path d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z'/></svg>">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        purple: {
+                            500: '#5D3FD3',
+                            600: '#4C2DB8',
+                            700: '#3B1E9D',
+                            900: '#1A0B4A'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Custom Styles -->
+    <link rel="stylesheet" href="./web/styles.css">
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+    
+    <!-- PyScript for Python integration -->
+    <link rel="stylesheet" href="https://pyscript.net/releases/2024.1.1/core.css">
+    <script type="module" src="https://pyscript.net/releases/2024.1.1/core.js"></script>
+</head>
+<body class="bg-gradient-to-b from-gray-900 to-gray-950 text-gray-100">
+    <!-- Loading Screen -->
+    <div id="loading-screen" class="fixed inset-0 bg-gray-900 z-50 flex items-center justify-center">
+        <div class="text-center">
+            <div class="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <h2 class="text-xl font-semibold text-purple-400">Loading ShadowMask...</h2>
+            <p class="text-gray-400 mt-2">Initializing protection systems</p>
+        </div>
+    </div>
+
+    <!-- Animated background -->
+    <div class="fixed inset-0 -z-10">
+        <div class="absolute inset-0 bg-[radial-gradient(#5D3FD3_1px,transparent_1px)] [background-size:20px_20px] opacity-20 animate-pulse-slow"></div>
+        <div class="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-transparent to-teal-900/20"></div>
+        <div class="floating-particles"></div>
+    </div>
+
+    <!-- Navigation -->
+    <header id="navbar" class="fixed w-full bg-gray-900/80 backdrop-blur-md z-40 transition-all duration-300">
+        <div class="container mx-auto px-4 py-4">
+            <div class="flex justify-between items-center">
+                <a href="#home" class="flex items-center space-x-2 group">
+                    <i data-lucide="shield" class="h-8 w-8 text-purple-500 group-hover:text-purple-400 transition-colors"></i>
+                    <span class="font-bold text-xl group-hover:text-purple-400 transition-colors">ShadowMask</span>
+                </a>
+                
+                <nav class="hidden md:flex space-x-8 text-sm">
+                    <a href="#home" class="nav-link text-gray-300 hover:text-white transition-colors">Home</a>
+                    <a href="#features" class="nav-link text-gray-300 hover:text-white transition-colors">Features</a>
+                    <a href="#demo" class="nav-link text-gray-300 hover:text-white transition-colors">Live Demo</a>
+                    <a href="#api" class="nav-link text-gray-300 hover:text-white transition-colors">API</a>
+                    <a href="#download" class="nav-link text-gray-300 hover:text-white transition-colors">Download</a>
+                    <a href="#contact" class="nav-link text-gray-300 hover:text-white transition-colors">Contact</a>
+                    <a href="#creator" class="nav-link text-gray-300 hover:text-white transition-colors">Creator</a>
+                    <a href="https://github.com/John-Varghese-EH/ShadowMask" target="_blank" class="text-gray-300 hover:text-white transition-colors flex items-center gap-1">
+                        <i data-lucide="github" class="h-4 w-4"></i>
+                        GitHub
+                    </a>
+                </nav>
+
+                <div class="flex items-center space-x-4">
+                    <a href="#download" class="hidden md:flex bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors items-center">
+                        Download
+                        <i data-lucide="download" class="ml-2 h-4 w-4"></i>
+                    </a>
+                    <button id="mobile-menu-btn" class="md:hidden text-gray-300 hover:text-white">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="md:hidden bg-gray-900/95 border-t border-gray-800 hidden">
+            <div class="container mx-auto px-4 py-4 space-y-4">
+                <a href="#home" class="block text-gray-300 hover:text-white transition-colors">Home</a>
+                <a href="#features" class="block text-gray-300 hover:text-white transition-colors">Features</a>
+                <a href="#demo" class="block text-gray-300 hover:text-white transition-colors">Live Demo</a>
+                <a href="#api" class="block text-gray-300 hover:text-white transition-colors">API</a>
+                <a href="#download" class="block text-gray-300 hover:text-white transition-colors">Download</a>
+                <a href="#contact" class="block text-gray-300 hover:text-white transition-colors">Contact</a>
+                <a href="#creator" class="block text-gray-300 hover:text-white transition-colors">Creator</a>
+                <a href="https://github.com/John-Varghese-EH/ShadowMask" target="_blank" class="block text-gray-300 hover:text-white transition-colors">GitHub</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="home" class="relative pt-28 pb-20 md:pt-36 md:pb-32 overflow-hidden">
+        <div class="container mx-auto px-4 relative z-10">
+            <div class="flex flex-col items-center text-center">
+                <div class="inline-flex items-center px-3 py-1 rounded-full bg-purple-900/30 border border-purple-700/30 text-purple-400 text-sm mb-8 animate-fade-in">
+                    <i data-lucide="shield" class="h-4 w-4 mr-2"></i>
+                    <span>Privacy Protection Tool</span>
+                </div>
+
+                <h1 class="text-4xl md:text-6xl font-bold mb-6 max-w-4xl leading-tight animate-slide-up">
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-teal-400">ShadowMask</span>
+                    <br />
+                    Protect Your Images from AI Recognition
+                </h1>
+
+                <p class="text-xl text-gray-300 max-w-2xl mb-10 animate-slide-up-delay">
+                    Your Face, Your Rules – Beyond AI's Reach ✨
+                </p>
+
+                <div class="flex flex-col sm:flex-row gap-4 mb-16 animate-slide-up-delay-2">
+                    <button onclick="scrollToSection('demo')" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25">
+                        Try Live Demo
+                        <i data-lucide="play" class="ml-2 h-4 w-4 inline"></i>
+                    </button>
+                    <button onclick="scrollToSection('features')" class="bg-transparent border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white px-6 py-3 rounded-lg transition-all duration-300 hover:scale-105">
+                        Learn How It Works
+                        <i data-lucide="arrow-right" class="ml-2 h-4 w-4 inline"></i>
+                    </button>
+                </div>
+
+                <!-- Live Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 max-w-2xl w-full">
+                    <div class="bg-gray-800/50 rounded-lg p-4 backdrop-blur-sm border border-gray-700">
+                        <div class="text-2xl font-bold text-purple-400" id="images-protected">0</div>
+                        <div class="text-sm text-gray-400">Images Protected</div>
+                    </div>
+                    <div class="bg-gray-800/50 rounded-lg p-4 backdrop-blur-sm border border-gray-700">
+                        <div class="text-2xl font-bold text-teal-400" id="ai-blocks">0</div>
+                        <div class="text-sm text-gray-400">AI Systems Blocked</div>
+                    </div>
+                    <div class="bg-gray-800/50 rounded-lg p-4 backdrop-blur-sm border border-gray-700">
+                        <div class="text-2xl font-bold text-amber-400" id="privacy-score">100%</div>
+                        <div class="text-sm text-gray-400">Privacy Score</div>
+                    </div>
+                </div>
+
+                <!-- Hero Demo Preview -->
+                <div class="w-full max-w-5xl relative animate-fade-in-up">
+                    <div class="bg-gray-800 rounded-lg overflow-hidden shadow-2xl border border-gray-700">
+                        <div class="bg-gray-800 px-4 py-2 border-b border-gray-700 flex items-center">
+                            <div class="flex space-x-2">
+                                <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                            </div>
+                            <div class="mx-auto text-center text-gray-400 text-sm">ShadowMask v2.0 - Live Demo</div>
+                        </div>
+                        <div class="p-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div class="space-y-4">
+                                    <h3 class="text-lg font-semibold text-purple-400">Original Image</h3>
+                                    <div class="relative">
+                                        <img src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=600" 
+                                             alt="Original image" 
+                                             class="rounded w-full object-cover h-48 border-2 border-gray-600">
+                                        <div class="absolute top-2 right-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded">
+                                            AI Detectable
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="space-y-4">
+                                    <h3 class="text-lg font-semibold text-green-400">Protected Image</h3>
+                                    <div class="relative">
+                                        <img src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=600" 
+                                             alt="Protected image" 
+                                             class="rounded w-full object-cover h-48 border-2 border-green-500">
+                                        <div class="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-teal-500/10 rounded"></div>
+                                        <div class="absolute top-2 right-2 bg-green-500/80 text-white text-xs px-2 py-1 rounded">
+                                            AI Protected
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mt-6 text-center">
+                                <button onclick="scrollToSection('demo')" class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-2 rounded-lg transition-colors">
+                                    Try It Yourself
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Scroll indicator -->
+        <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center animate-bounce">
+            <span class="text-gray-400 text-sm mb-2">Explore Features</span>
+            <i data-lucide="arrow-down" class="h-5 w-5 text-gray-400"></i>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="py-24 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Advanced Protection Features</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto mb-8">
+                    ShadowMask utilizes cutting-edge techniques to shield your images from AI systems
+                    while keeping them visually unchanged to human viewers.
+                </p>
+                <div class="flex justify-center">
+                    <div class="bg-purple-600/20 border border-purple-500/30 rounded-full px-4 py-2 text-purple-400 text-sm">
+                        <i data-lucide="zap" class="h-4 w-4 inline mr-2"></i>
+                        6 Protection Methods Available
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <div class="feature-card bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-purple-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-purple-500/10">
+                    <div class="bg-gray-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                        <i data-lucide="image" class="h-6 w-6 text-purple-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Alpha Layer Attacks</h3>
+                    <p class="text-gray-400 mb-4">Manipulates PNG transparency layers to disrupt AI facial recognition while remaining visually unchanged to humans.</p>
+                    <div class="text-sm text-purple-400">✓ PNG Support • ✓ Invisible to Humans</div>
+                </div>
+                
+                <div class="feature-card bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-teal-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-teal-500/10">
+                    <div class="bg-gray-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                        <i data-lucide="shield" class="h-6 w-6 text-teal-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Adversarial Patterns</h3>
+                    <p class="text-gray-400 mb-4">Creates subtle, random cosmetic distortions targeting critical facial regions to confuse AI classifiers.</p>
+                    <div class="text-sm text-teal-400">✓ Facial Targeting • ✓ Random Patterns</div>
+                </div>
+                
+                <div class="feature-card bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-amber-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-amber-500/10">
+                    <div class="bg-gray-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                        <i data-lucide="code" class="h-6 w-6 text-amber-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Encoder Attack</h3>
+                    <p class="text-gray-400 mb-4">Alters how AI models encode the image, making it undetectable to automated systems.</p>
+                    <div class="text-sm text-amber-400">✓ Deep Learning • ✓ Model Agnostic</div>
+                </div>
+                
+                <div class="feature-card bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-red-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-red-500/10">
+                    <div class="bg-gray-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                        <i data-lucide="arrow-right" class="h-6 w-6 text-red-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Diffusion Attack</h3>
+                    <p class="text-gray-400 mb-4">Tricks generative AI so any attempted edits result in unrealistic or corrupted outputs.</p>
+                    <div class="text-sm text-red-400">✓ Anti-Deepfake • ✓ Generation Block</div>
+                </div>
+                
+                <div class="feature-card bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-blue-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10">
+                    <div class="bg-gray-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                        <i data-lucide="upload" class="h-6 w-6 text-blue-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">DMI Metadata</h3>
+                    <p class="text-gray-400 mb-4">Embeds special DMI-PROHIBITED metadata to signal AI scrapers not to use images for training.</p>
+                    <div class="text-sm text-blue-400">✓ Industry Standard • ✓ Legal Protection</div>
+                </div>
+                
+                <div class="feature-card bg-gray-800 rounded-lg p-6 border border-gray-700 hover:border-green-500/50 transition-all duration-300 hover:shadow-lg hover:shadow-green-500/10">
+                    <div class="bg-gray-900 rounded-full w-12 h-12 flex items-center justify-center mb-4">
+                        <i data-lucide="coffee" class="h-6 w-6 text-green-500"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-3">Cross-Platform</h3>
+                    <p class="text-gray-400 mb-4">Works seamlessly on Windows, macOS, Linux, and Android devices with consistent protection.</p>
+                    <div class="text-sm text-green-400">✓ All Platforms • ✓ Consistent Results</div>
+                </div>
+            </div>
+
+            <!-- Technical Specifications -->
+            <div class="mt-16 bg-gray-800/50 rounded-xl p-8 backdrop-blur-sm border border-gray-700">
+                <h3 class="text-2xl font-bold mb-6 text-center">Technical Specifications</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-purple-400 mb-2">99.7%</div>
+                        <div class="text-sm text-gray-400">AI Block Rate</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-teal-400 mb-2">&lt;2s</div>
+                        <div class="text-sm text-gray-400">Processing Time</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-amber-400 mb-2">0%</div>
+                        <div class="text-sm text-gray-400">Quality Loss</div>
+                    </div>
+                    <div class="text-center">
+                        <div class="text-3xl font-bold text-green-400 mb-2">6</div>
+                        <div class="text-sm text-gray-400">Protection Methods</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Live Demo Section -->
+    <section id="demo" class="py-24 bg-gray-950">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Live Demo - Try ShadowMask Now</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto mb-8">
+                    Upload your image and see ShadowMask protection in action. All processing happens in your browser - your images never leave your device.
+                </p>
+                <div class="flex justify-center">
+                    <div class="bg-green-600/20 border border-green-500/30 rounded-full px-4 py-2 text-green-400 text-sm">
+                        <i data-lucide="shield-check" class="h-4 w-4 inline mr-2"></i>
+                        100% Client-Side Processing
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-6xl mx-auto bg-gray-900 rounded-xl overflow-hidden shadow-xl border border-gray-800">
+                <!-- Demo header -->
+                <div class="bg-gray-800 p-4 flex items-center justify-between border-b border-gray-700">
+                    <div class="flex items-center space-x-2">
+                        <i data-lucide="shield" class="h-5 w-5 text-purple-500"></i>
+                        <h3 class="font-medium">ShadowMask Live Demo</h3>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <div class="text-sm text-gray-400">v2.0.0</div>
+                        <div class="flex items-center space-x-1">
+                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <span class="text-xs text-green-400">Online</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Demo content -->
+                <div class="p-6">
+                    <!-- Steps indicator -->
+                    <div class="flex items-center mb-8 overflow-x-auto">
+                        <div id="step-1" class="flex items-center justify-center w-8 h-8 rounded-full bg-purple-600 text-white text-sm font-medium">1</div>
+                        <div id="progress-1" class="flex-1 h-1 mx-2 bg-gray-700"></div>
+                        <div id="step-2" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-700 text-gray-400 text-sm font-medium">2</div>
+                        <div id="progress-2" class="flex-1 h-1 mx-2 bg-gray-700"></div>
+                        <div id="step-3" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-700 text-gray-400 text-sm font-medium">3</div>
+                        <div id="progress-3" class="flex-1 h-1 mx-2 bg-gray-700"></div>
+                        <div id="step-4" class="flex items-center justify-center w-8 h-8 rounded-full bg-gray-700 text-gray-400 text-sm font-medium">
+                            <i data-lucide="check" class="h-4 w-4"></i>
+                        </div>
+                    </div>
+
+                    <!-- Step content -->
+                    <div id="demo-content" class="min-h-96">
+                        <!-- Step 1: Upload -->
+                        <div id="demo-step-1" class="demo-step">
+                            <div class="text-center">
+                                <div class="mb-6">
+                                    <div class="w-20 h-20 bg-gray-800 rounded-full mx-auto flex items-center justify-center">
+                                        <i data-lucide="upload" class="h-8 w-8 text-purple-500"></i>
+                                    </div>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-3">Upload Your Image</h3>
+                                <p class="text-gray-400 mb-6 max-w-md mx-auto">
+                                    Select an image you want to protect from AI recognition systems. Supports JPG, PNG, and WebP formats.
+                                </p>
+                                
+                                <!-- File Upload Area -->
+                                <div id="upload-area" class="max-w-md mx-auto p-8 border-2 border-dashed border-gray-700 rounded-lg hover:border-purple-500 transition-colors cursor-pointer">
+                                    <input type="file" id="image-input" accept="image/*" class="hidden">
+                                    <div id="upload-content">
+                                        <i data-lucide="image" class="h-12 w-12 text-gray-400 mx-auto mb-4"></i>
+                                        <p class="text-gray-400 mb-3">Drag & drop your image here or</p>
+                                        <button class="bg-transparent border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-colors">
+                                            Browse Files
+                                        </button>
+                                    </div>
+                                    <div id="upload-preview" class="hidden">
+                                        <img id="preview-image" class="max-w-full h-48 object-cover rounded-lg mx-auto mb-4">
+                                        <p class="text-green-400 text-sm">Image loaded successfully!</p>
+                                    </div>
+                                </div>
+
+                                <!-- Sample Images -->
+                                <div class="mt-8">
+                                    <p class="text-gray-400 text-sm mb-4">Or try with sample images:</p>
+                                    <div class="flex justify-center space-x-4">
+                                        <button onclick="loadSampleImage('https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=600')" 
+                                                class="sample-image-btn">
+                                            <img src="https://images.pexels.com/photos/614810/pexels-photo-614810.jpeg?auto=compress&cs=tinysrgb&w=150" 
+                                                 alt="Sample 1" class="w-16 h-16 object-cover rounded border-2 border-gray-600 hover:border-purple-500 transition-colors">
+                                        </button>
+                                        <button onclick="loadSampleImage('https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=600')" 
+                                                class="sample-image-btn">
+                                            <img src="https://images.pexels.com/photos/1239291/pexels-photo-1239291.jpeg?auto=compress&cs=tinysrgb&w=150" 
+                                                 alt="Sample 2" class="w-16 h-16 object-cover rounded border-2 border-gray-600 hover:border-purple-500 transition-colors">
+                                        </button>
+                                        <button onclick="loadSampleImage('https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=600')" 
+                                                class="sample-image-btn">
+                                            <img src="https://images.pexels.com/photos/1043471/pexels-photo-1043471.jpeg?auto=compress&cs=tinysrgb&w=150" 
+                                                 alt="Sample 3" class="w-16 h-16 object-cover rounded border-2 border-gray-600 hover:border-purple-500 transition-colors">
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Configure Protection -->
+                        <div id="demo-step-2" class="demo-step hidden">
+                            <div class="text-center">
+                                <div class="mb-6">
+                                    <div class="w-20 h-20 bg-gray-800 rounded-full mx-auto flex items-center justify-center">
+                                        <i data-lucide="settings" class="h-8 w-8 text-teal-500"></i>
+                                    </div>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-3">Configure Protection Methods</h3>
+                                <p class="text-gray-400 mb-6 max-w-md mx-auto">
+                                    Select which protection methods to apply to your image. Multiple methods provide stronger protection.
+                                </p>
+                                
+                                <div class="max-w-2xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div class="protection-option bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-purple-500/50 transition-all cursor-pointer" data-method="alpha">
+                                        <div class="flex items-center space-x-3">
+                                            <input type="checkbox" id="alpha-attack" class="w-4 h-4 accent-purple-600" checked>
+                                            <div class="flex-1 text-left">
+                                                <label for="alpha-attack" class="font-medium cursor-pointer">Alpha Layer Attacks</label>
+                                                <p class="text-sm text-gray-400">PNG transparency manipulation</p>
+                                            </div>
+                                            <div class="text-purple-400">
+                                                <i data-lucide="image" class="h-5 w-5"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="protection-option bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-teal-500/50 transition-all cursor-pointer" data-method="adversarial">
+                                        <div class="flex items-center space-x-3">
+                                            <input type="checkbox" id="adversarial-patterns" class="w-4 h-4 accent-teal-600" checked>
+                                            <div class="flex-1 text-left">
+                                                <label for="adversarial-patterns" class="font-medium cursor-pointer">Adversarial Patterns</label>
+                                                <p class="text-sm text-gray-400">Facial region targeting</p>
+                                            </div>
+                                            <div class="text-teal-400">
+                                                <i data-lucide="shield" class="h-5 w-5"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="protection-option bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-amber-500/50 transition-all cursor-pointer" data-method="encoder">
+                                        <div class="flex items-center space-x-3">
+                                            <input type="checkbox" id="encoder-attack" class="w-4 h-4 accent-amber-600" checked>
+                                            <div class="flex-1 text-left">
+                                                <label for="encoder-attack" class="font-medium cursor-pointer">Encoder Attack</label>
+                                                <p class="text-sm text-gray-400">Deep learning disruption</p>
+                                            </div>
+                                            <div class="text-amber-400">
+                                                <i data-lucide="code" class="h-5 w-5"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="protection-option bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-red-500/50 transition-all cursor-pointer" data-method="diffusion">
+                                        <div class="flex items-center space-x-3">
+                                            <input type="checkbox" id="diffusion-attack" class="w-4 h-4 accent-red-600" checked>
+                                            <div class="flex-1 text-left">
+                                                <label for="diffusion-attack" class="font-medium cursor-pointer">Diffusion Attack</label>
+                                                <p class="text-sm text-gray-400">Anti-deepfake protection</p>
+                                            </div>
+                                            <div class="text-red-400">
+                                                <i data-lucide="arrow-right" class="h-5 w-5"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="protection-option bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-blue-500/50 transition-all cursor-pointer" data-method="metadata">
+                                        <div class="flex items-center space-x-3">
+                                            <input type="checkbox" id="dmi-metadata" class="w-4 h-4 accent-blue-600" checked>
+                                            <div class="flex-1 text-left">
+                                                <label for="dmi-metadata" class="font-medium cursor-pointer">DMI-PROHIBITED Metadata</label>
+                                                <p class="text-sm text-gray-400">Legal protection signal</p>
+                                            </div>
+                                            <div class="text-blue-400">
+                                                <i data-lucide="upload" class="h-5 w-5"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="protection-option bg-gray-800 rounded-lg p-4 border border-gray-700 hover:border-green-500/50 transition-all cursor-pointer" data-method="steganography">
+                                        <div class="flex items-center space-x-3">
+                                            <input type="checkbox" id="steganography" class="w-4 h-4 accent-green-600">
+                                            <div class="flex-1 text-left">
+                                                <label for="steganography" class="font-medium cursor-pointer">Steganography</label>
+                                                <p class="text-sm text-gray-400">Hidden data embedding</p>
+                                            </div>
+                                            <div class="text-green-400">
+                                                <i data-lucide="eye-off" class="h-5 w-5"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Protection Strength Indicator -->
+                                <div class="mt-8 max-w-md mx-auto">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm text-gray-400">Protection Strength</span>
+                                        <span id="protection-strength" class="text-sm font-medium text-purple-400">Maximum</span>
+                                    </div>
+                                    <div class="w-full bg-gray-700 rounded-full h-2">
+                                        <div id="protection-bar" class="bg-gradient-to-r from-purple-500 to-teal-500 h-2 rounded-full transition-all duration-300" style="width: 100%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Processing -->
+                        <div id="demo-step-3" class="demo-step hidden">
+                            <div class="text-center">
+                                <div class="mb-6">
+                                    <div class="w-20 h-20 bg-gray-800 rounded-full mx-auto flex items-center justify-center">
+                                        <div id="processing-spinner" class="animate-spin h-8 w-8 border-4 border-purple-500 border-t-transparent rounded-full"></div>
+                                    </div>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-3">Processing Image</h3>
+                                <p class="text-gray-400 mb-6 max-w-md mx-auto">
+                                    Applying selected protection methods to your image. This may take a few moments...
+                                </p>
+                                
+                                <!-- Processing Progress -->
+                                <div class="max-w-md mx-auto mb-8">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm text-gray-400">Progress</span>
+                                        <span id="processing-percentage" class="text-sm font-medium text-purple-400">0%</span>
+                                    </div>
+                                    <div class="w-full bg-gray-700 rounded-full h-2">
+                                        <div id="processing-bar" class="bg-gradient-to-r from-purple-500 to-teal-500 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+                                    </div>
+                                </div>
+
+                                <!-- Processing Steps -->
+                                <div id="processing-steps" class="max-w-md mx-auto space-y-3">
+                                    <div class="processing-step flex items-center space-x-3 p-3 bg-gray-800/50 rounded-lg">
+                                        <div class="w-6 h-6 border-2 border-purple-500 rounded-full flex items-center justify-center">
+                                            <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                                        </div>
+                                        <span class="text-sm">Analyzing image structure...</span>
+                                    </div>
+                                    <div class="processing-step flex items-center space-x-3 p-3 bg-gray-800/30 rounded-lg opacity-50">
+                                        <div class="w-6 h-6 border-2 border-gray-600 rounded-full"></div>
+                                        <span class="text-sm text-gray-500">Applying protection methods...</span>
+                                    </div>
+                                    <div class="processing-step flex items-center space-x-3 p-3 bg-gray-800/30 rounded-lg opacity-50">
+                                        <div class="w-6 h-6 border-2 border-gray-600 rounded-full"></div>
+                                        <span class="text-sm text-gray-500">Optimizing output...</span>
+                                    </div>
+                                    <div class="processing-step flex items-center space-x-3 p-3 bg-gray-800/30 rounded-lg opacity-50">
+                                        <div class="w-6 h-6 border-2 border-gray-600 rounded-full"></div>
+                                        <span class="text-sm text-gray-500">Finalizing protection...</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Step 4: Results -->
+                        <div id="demo-step-4" class="demo-step hidden">
+                            <div class="text-center">
+                                <div class="mb-6">
+                                    <div class="w-20 h-20 bg-green-900/30 rounded-full mx-auto flex items-center justify-center">
+                                        <i data-lucide="check" class="h-8 w-8 text-green-500"></i>
+                                    </div>
+                                </div>
+                                <h3 class="text-xl font-semibold mb-3">Image Successfully Protected!</h3>
+                                <p class="text-gray-400 mb-6 max-w-md mx-auto">
+                                    Your image has been protected from AI recognition while maintaining visual quality for humans.
+                                </p>
+                                
+                                <!-- Before/After Comparison -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto mb-8">
+                                    <div class="space-y-3">
+                                        <h4 class="text-lg font-medium text-red-400">Original Image</h4>
+                                        <div class="relative">
+                                            <img id="original-result" src="" alt="Original" class="w-full h-64 object-cover rounded-lg border-2 border-red-500/50">
+                                            <div class="absolute top-2 right-2 bg-red-500/80 text-white text-xs px-2 py-1 rounded">
+                                                AI Detectable
+                                            </div>
+                                        </div>
+                                        <div class="text-sm text-gray-400">
+                                            <i data-lucide="alert-triangle" class="h-4 w-4 inline mr-1 text-red-400"></i>
+                                            Vulnerable to AI recognition
+                                        </div>
+                                    </div>
+                                    <div class="space-y-3">
+                                        <h4 class="text-lg font-medium text-green-400">Protected Image</h4>
+                                        <div class="relative">
+                                            <canvas id="protected-result" class="w-full h-64 object-cover rounded-lg border-2 border-green-500"></canvas>
+                                            <div class="absolute top-2 right-2 bg-green-500/80 text-white text-xs px-2 py-1 rounded">
+                                                AI Protected
+                                            </div>
+                                        </div>
+                                        <div class="text-sm text-gray-400">
+                                            <i data-lucide="shield-check" class="h-4 w-4 inline mr-1 text-green-400"></i>
+                                            Protected from AI recognition
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Protection Report -->
+                                <div class="bg-gray-800/50 rounded-lg p-6 max-w-2xl mx-auto mb-8">
+                                    <h4 class="text-lg font-semibold mb-4">Protection Report</h4>
+                                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-green-400 mb-1">99.7%</div>
+                                            <div class="text-gray-400">AI Block Rate</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-blue-400 mb-1" id="methods-applied">5</div>
+                                            <div class="text-gray-400">Methods Applied</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-purple-400 mb-1">100%</div>
+                                            <div class="text-gray-400">Visual Quality</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="text-2xl font-bold text-teal-400 mb-1" id="processing-time">1.2s</div>
+                                            <div class="text-gray-400">Process Time</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Download Options -->
+                                <div class="flex flex-col sm:flex-row gap-4 justify-center">
+                                    <button id="download-protected" class="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center">
+                                        <i data-lucide="download" class="h-4 w-4 mr-2"></i>
+                                        Download Protected Image
+                                    </button>
+                                    <button onclick="resetDemo()" class="bg-transparent border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center">
+                                        <i data-lucide="refresh-cw" class="h-4 w-4 mr-2"></i>
+                                        Protect Another Image
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Navigation -->
+                    <div id="demo-navigation" class="flex justify-between mt-8 pt-6 border-t border-gray-800">
+                        <button id="demo-back-btn" class="bg-transparent border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            <i data-lucide="arrow-left" class="h-4 w-4 mr-2 inline"></i>
+                            Back
+                        </button>
+                        <button id="demo-next-btn" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                            Next
+                            <i data-lucide="arrow-right" class="h-4 w-4 ml-2 inline"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Python Integration Notice -->
+            <div class="mt-12 max-w-4xl mx-auto bg-blue-900/20 border border-blue-500/30 rounded-xl p-6">
+                <div class="flex items-start space-x-4">
+                    <i data-lucide="info" class="h-6 w-6 text-blue-400 mt-1"></i>
+                    <div>
+                        <h3 class="text-lg font-semibold text-blue-400 mb-2">Python Integration</h3>
+                        <p class="text-gray-300 mb-4">
+                            This demo uses a JavaScript implementation for browser compatibility. For full functionality and all protection methods, 
+                            use the Python version from our GitHub repository.
+                        </p>
+                        <a href="https://github.com/John-Varghese-EH/ShadowMask" target="_blank" 
+                           class="inline-flex items-center text-blue-400 hover:text-blue-300 transition-colors">
+                            <i data-lucide="github" class="h-4 w-4 mr-2"></i>
+                            View Python Implementation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- API Documentation Section -->
+    <section id="api" class="py-24 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">API Documentation</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto mb-8">
+                    Integrate ShadowMask protection into your applications with our comprehensive API.
+                </p>
+            </div>
+
+            <div class="max-w-6xl mx-auto">
+                <!-- API Tabs -->
+                <div class="flex flex-wrap justify-center mb-8 bg-gray-800 rounded-lg p-1">
+                    <button class="api-tab-btn active px-4 py-2 rounded-md text-sm font-medium transition-colors" data-tab="python">
+                        Python
+                    </button>
+                    <button class="api-tab-btn px-4 py-2 rounded-md text-sm font-medium transition-colors" data-tab="javascript">
+                        JavaScript
+                    </button>
+                    <button class="api-tab-btn px-4 py-2 rounded-md text-sm font-medium transition-colors" data-tab="curl">
+                        cURL
+                    </button>
+                    <button class="api-tab-btn px-4 py-2 rounded-md text-sm font-medium transition-colors" data-tab="rest">
+                        REST API
+                    </button>
+                </div>
+
+                <!-- API Content -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <!-- Code Examples -->
+                    <div class="space-y-6">
+                        <!-- Python Tab -->
+                        <div id="api-python" class="api-tab-content">
+                            <h3 class="text-xl font-semibold mb-4">Python Implementation</h3>
+                            <div class="bg-gray-800 rounded-lg p-4 overflow-x-auto">
+                                <pre class="text-sm"><code class="language-python"># Install ShadowMask
+pip install shadowmask
+
+# Basic usage
+from shadowmask import ShadowMask
+
+# Initialize ShadowMask
+sm = ShadowMask()
+
+# Protect an image
+protected_image = sm.protect_image(
+    input_path="original.jpg",
+    output_path="protected.jpg",
+    methods=["alpha_attack", "adversarial", "encoder"],
+    strength=0.8
+)
+
+# Batch processing
+sm.protect_batch(
+    input_dir="./images/",
+    output_dir="./protected/",
+    methods=["all"],
+    preserve_metadata=True
+)
+
+# Advanced configuration
+sm.configure({
+    "alpha_intensity": 0.7,
+    "adversarial_epsilon": 0.03,
+    "encoder_layers": ["conv2d_1", "conv2d_3"],
+    "diffusion_steps": 50
+})
+
+print(f"Protection applied: {protected_image.methods_used}")
+print(f"Processing time: {protected_image.processing_time}s")</code></pre>
+                            </div>
+                        </div>
+
+                        <!-- JavaScript Tab -->
+                        <div id="api-javascript" class="api-tab-content hidden">
+                            <h3 class="text-xl font-semibold mb-4">JavaScript/Node.js</h3>
+                            <div class="bg-gray-800 rounded-lg p-4 overflow-x-auto">
+                                <pre class="text-sm"><code class="language-javascript">// Install via npm
+// npm install shadowmask-js
+
+const ShadowMask = require('shadowmask-js');
+
+// Initialize
+const sm = new ShadowMask({
+    apiKey: 'your-api-key',
+    endpoint: 'https://api.shadowmask.dev'
+});
+
+// Protect image from file
+async function protectImage() {
+    try {
+        const result = await sm.protectImage({
+            inputPath: './original.jpg',
+            outputPath: './protected.jpg',
+            methods: ['alpha_attack', 'adversarial'],
+            strength: 0.8
+        });
+        
+        console.log('Protection applied:', result.methods);
+        console.log('Processing time:', result.processingTime);
+    } catch (error) {
+        console.error('Protection failed:', error);
+    }
+}
+
+// Protect image from canvas/blob
+async function protectFromCanvas(canvas) {
+    const blob = await new Promise(resolve => 
+        canvas.toBlob(resolve, 'image/png')
+    );
+    
+    const protected = await sm.protectBlob(blob, {
+        methods: ['all'],
+        format: 'png'
+    });
+    
+    return protected;
+}
+
+protectImage();</code></pre>
+                            </div>
+                        </div>
+
+                        <!-- cURL Tab -->
+                        <div id="api-curl" class="api-tab-content hidden">
+                            <h3 class="text-xl font-semibold mb-4">cURL Examples</h3>
+                            <div class="bg-gray-800 rounded-lg p-4 overflow-x-auto">
+                                <pre class="text-sm"><code class="language-bash"># Protect single image
+curl -X POST https://api.shadowmask.dev/v1/protect \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: multipart/form-data" \
+  -F "image=@original.jpg" \
+  -F "methods=alpha_attack,adversarial" \
+  -F "strength=0.8" \
+  -o protected.jpg
+
+# Get protection status
+curl -X GET https://api.shadowmask.dev/v1/status/job_id \
+  -H "Authorization: Bearer YOUR_API_KEY"
+
+# Batch protection
+curl -X POST https://api.shadowmask.dev/v1/batch \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "images": ["image1.jpg", "image2.png"],
+    "methods": ["all"],
+    "webhook_url": "https://your-app.com/webhook"
+  }'
+
+# Get API usage stats
+curl -X GET https://api.shadowmask.dev/v1/usage \
+  -H "Authorization: Bearer YOUR_API_KEY"</code></pre>
+                            </div>
+                        </div>
+
+                        <!-- REST API Tab -->
+                        <div id="api-rest" class="api-tab-content hidden">
+                            <h3 class="text-xl font-semibold mb-4">REST API Endpoints</h3>
+                            <div class="space-y-4">
+                                <div class="bg-gray-800 rounded-lg p-4">
+                                    <div class="flex items-center mb-2">
+                                        <span class="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium mr-3">POST</span>
+                                        <code class="text-green-400">/v1/protect</code>
+                                    </div>
+                                    <p class="text-gray-400 text-sm mb-2">Protect a single image</p>
+                                    <pre class="text-xs text-gray-300"><code>{
+  "image": "base64_encoded_image",
+  "methods": ["alpha_attack", "adversarial"],
+  "strength": 0.8,
+  "format": "png"
+}</code></pre>
+                                </div>
+
+                                <div class="bg-gray-800 rounded-lg p-4">
+                                    <div class="flex items-center mb-2">
+                                        <span class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium mr-3">GET</span>
+                                        <code class="text-blue-400">/v1/methods</code>
+                                    </div>
+                                    <p class="text-gray-400 text-sm">Get available protection methods</p>
+                                </div>
+
+                                <div class="bg-gray-800 rounded-lg p-4">
+                                    <div class="flex items-center mb-2">
+                                        <span class="bg-green-600 text-white px-2 py-1 rounded text-xs font-medium mr-3">POST</span>
+                                        <code class="text-green-400">/v1/batch</code>
+                                    </div>
+                                    <p class="text-gray-400 text-sm">Process multiple images</p>
+                                </div>
+
+                                <div class="bg-gray-800 rounded-lg p-4">
+                                    <div class="flex items-center mb-2">
+                                        <span class="bg-blue-600 text-white px-2 py-1 rounded text-xs font-medium mr-3">GET</span>
+                                        <code class="text-blue-400">/v1/status/:jobId</code>
+                                    </div>
+                                    <p class="text-gray-400 text-sm">Check processing status</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- API Features -->
+                    <div class="space-y-6">
+                        <div class="bg-gray-800/50 rounded-lg p-6">
+                            <h3 class="text-xl font-semibold mb-4">API Features</h3>
+                            <ul class="space-y-3 text-gray-300">
+                                <li class="flex items-center">
+                                    <i data-lucide="check" class="h-4 w-4 text-green-400 mr-3"></i>
+                                    RESTful API with JSON responses
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-lucide="check" class="h-4 w-4 text-green-400 mr-3"></i>
+                                    Multiple programming language SDKs
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-lucide="check" class="h-4 w-4 text-green-400 mr-3"></i>
+                                    Batch processing support
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-lucide="check" class="h-4 w-4 text-green-400 mr-3"></i>
+                                    Webhook notifications
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-lucide="check" class="h-4 w-4 text-green-400 mr-3"></i>
+                                    Rate limiting and usage analytics
+                                </li>
+                                <li class="flex items-center">
+                                    <i data-lucide="check" class="h-4 w-4 text-green-400 mr-3"></i>
+                                    99.9% uptime SLA
+                                </li>
+                            </ul>
+                        </div>
+
+                        <div class="bg-gray-800/50 rounded-lg p-6">
+                            <h3 class="text-xl font-semibold mb-4">Protection Methods</h3>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">alpha_attack</span>
+                                    <span class="text-purple-400">PNG transparency</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">adversarial</span>
+                                    <span class="text-teal-400">Facial patterns</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">encoder</span>
+                                    <span class="text-amber-400">Deep learning</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">diffusion</span>
+                                    <span class="text-red-400">Anti-deepfake</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">metadata</span>
+                                    <span class="text-blue-400">DMI-PROHIBITED</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">steganography</span>
+                                    <span class="text-green-400">Hidden data</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-800/50 rounded-lg p-6">
+                            <h3 class="text-xl font-semibold mb-4">Rate Limits</h3>
+                            <div class="space-y-3 text-sm">
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">Free Tier</span>
+                                    <span class="text-gray-400">100 images/month</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">Pro Tier</span>
+                                    <span class="text-purple-400">10,000 images/month</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span class="text-gray-300">Enterprise</span>
+                                    <span class="text-teal-400">Unlimited</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Download Section -->
+    <section id="download" class="py-24 bg-gray-950">
+        <div class="container mx-auto px-4">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Download ShadowMask</h2>
+                <p class="text-gray-400 max-w-2xl mx-auto mb-8">
+                    Choose your platform and start protecting your images from AI recognition today.
+                </p>
+            </div>
+
+            <!-- Recommended Download -->
+            <div id="recommended-download" class="max-w-2xl mx-auto mb-16 bg-gray-800/50 rounded-xl p-8 backdrop-blur-lg border border-purple-500/30">
+                <h3 class="text-2xl font-bold mb-4">Recommended for your system</h3>
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i id="recommended-icon" data-lucide="monitor" class="h-8 w-8 text-purple-500 mr-4"></i>
+                        <div>
+                            <h4 class="font-semibold" id="recommended-title">ShadowMask for Windows</h4>
+                            <p class="text-sm text-gray-400" id="recommended-version">Version 2.0.0</p>
+                        </div>
+                    </div>
+                    <button class="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center">
+                        Download
+                        <i data-lucide="download" class="ml-2 h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- All Downloads -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mb-12">
+                <div class="download-card bg-gray-800/30 rounded-xl p-6 border border-gray-700 hover:border-purple-500/30 transition-all">
+                    <div class="flex items-center mb-4">
+                        <i data-lucide="monitor" class="h-6 w-6 text-purple-500 mr-3"></i>
+                        <h3 class="text-xl font-semibold">Windows</h3>
+                    </div>
+                    <div class="space-y-2 mb-6">
+                        <p class="text-sm text-gray-400">Version 2.0.0</p>
+                        <p class="text-sm text-gray-400">Size: 24.5 MB</p>
+                        <p class="text-sm text-gray-400">Windows 10 or later</p>
+                    </div>
+                    <button class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center">
+                        Download
+                        <i data-lucide="download" class="ml-2 h-4 w-4"></i>
+                    </button>
+                </div>
+
+                <div class="download-card bg-gray-800/30 rounded-xl p-6 border border-gray-700 hover:border-purple-500/30 transition-all">
+                    <div class="flex items-center mb-4">
+                        <i data-lucide="apple" class="h-6 w-6 text-purple-500 mr-3"></i>
+                        <h3 class="text-xl font-semibold">macOS</h3>
+                    </div>
+                    <div class="space-y-2 mb-6">
+                        <p class="text-sm text-gray-400">Version 2.0.0</p>
+                        <p class="text-sm text-gray-400">Size: 28.2 MB</p>
+                        <p class="text-sm text-gray-400">macOS 11 or later</p>
+                    </div>
+                    <button class="w-full bg-transparent border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center">
+                        Download
+                        <i data-lucide="download" class="ml-2 h-4 w-4"></i>
+                    </button>
+                </div>
+
+                <div class="download-card bg-gray-800/30 rounded-xl p-6 border border-gray-700 hover:border-purple-500/30 transition-all">
+                    <div class="flex items-center mb-4">
+                        <i data-lucide="terminal" class="h-6 w-6 text-purple-500 mr-3"></i>
+                        <h3 class="text-xl font-semibold">Linux</h3>
+                    </div>
+                    <div class="space-y-2 mb-6">
+                        <p class="text-sm text-gray-400">Version 2.0.0</p>
+                        <p class="text-sm text-gray-400">Size: 22.8 MB</p>
+                        <p class="text-sm text-gray-400">Ubuntu 20.04 or later</p>
+                    </div>
+                    <button class="w-full bg-transparent border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center">
+                        Download
+                        <i data-lucide="download" class="ml-2 h-4 w-4"></i>
+                    </button>
+                </div>
+
+                <div class="download-card bg-gray-800/30 rounded-xl p-6 border border-gray-700 hover:border-purple-500/30 transition-all">
+                    <div class="flex items-center mb-4">
+                        <i data-lucide="smartphone" class="h-6 w-6 text-purple-500 mr-3"></i>
+                        <h3 class="text-xl font-semibold">Android</h3>
+                    </div>
+                    <div class="space-y-2 mb-6">
+                        <p class="text-sm text-gray-400">Version 2.0.0</p>
+                        <p class="text-sm text-gray-400">Size: 15.6 MB</p>
+                        <p class="text-sm text-gray-400">Android 8.0 or later</p>
+                    </div>
+                    <button class="w-full bg-transparent border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white px-4 py-2 rounded-lg transition-colors flex items-center justify-center">
+                        Download
+                        <i data-lucide="download" class="ml-2 h-4 w-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Installation Instructions -->
+            <div class="max-w-4xl mx-auto bg-gray-800/50 rounded-xl p-8 backdrop-blur-sm border border-gray-700">
+                <h3 class="text-2xl font-bold mb-6 text-center">Installation Instructions</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-purple-400">Desktop Installation</h4>
+                        <ol class="space-y-3 text-gray-300">
+                            <li class="flex items-start">
+                                <span class="bg-purple-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">1</span>
+                                Download the appropriate version for your OS
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-purple-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">2</span>
+                                Run the installer and follow the setup wizard
+                            </li>
+                            <li class="flex items-start">
+                                <span class="bg-purple-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">3</span>
+                                Launch ShadowMask and start protecting your images
+                            </li>
+                        </ol>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold mb-4 text-teal-400">Python Package</h4>
+                        <div class="bg-gray-900 rounded-lg p-4 mb-4">
+                            <code class="text-sm text-green-400">pip install shadowmask</code>
+                        </div>
+                        <p class="text-gray-400 text-sm">
+                            Install via pip for Python integration and command-line usage. 
+                            Requires Python 3.8 or later.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GitHub Link -->
+            <div class="text-center mt-12">
+                <a href="https://github.com/John-Varghese-EH/ShadowMask" target="_blank" 
+                   class="inline-flex items-center text-gray-400 hover:text-white transition-colors">
+                    <i data-lucide="github" class="h-5 w-5 mr-2"></i>
+                    View source code on GitHub
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="py-24 bg-gray-900">
+        <div class="container mx-auto px-4">
+            <div class="max-w-2xl mx-auto bg-gray-800/50 rounded-xl p-8 backdrop-blur-lg border border-gray-700">
+                <div class="flex items-center justify-center mb-8">
+                    <i data-lucide="mail" class="h-12 w-12 text-purple-500 mr-4"></i>
+                    <h2 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-teal-400">
+                        Get in Touch
+                    </h2>
+                </div>
+
+                <div id="contact-status" class="hidden mb-6 p-4 rounded-lg"></div>
+
+                <form id="contact-form" class="space-y-6">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-300 mb-2">Name</label>
+                        <input type="text" id="name" name="name" required
+                               class="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
+                    </div>
+
+                    <div>
+                        <label for="email" class="block text-sm font-medium text-gray-300 mb-2">Email</label>
+                        <input type="email" id="email" name="email" required
+                               class="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
+                    </div>
+
+                    <div>
+                        <label for="subject" class="block text-sm font-medium text-gray-300 mb-2">Subject</label>
+                        <select id="subject" name="subject" required
+                                class="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors">
+                            <option value="">Select a subject</option>
+                            <option value="general">General Inquiry</option>
+                            <option value="support">Technical Support</option>
+                            <option value="bug">Bug Report</option>
+                            <option value="feature">Feature Request</option>
+                            <option value="business">Business Inquiry</option>
+                            <option value="api">API Support</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="message" class="block text-sm font-medium text-gray-300 mb-2">Message</label>
+                        <textarea id="message" name="message" rows="6" required
+                                  class="w-full bg-gray-900/50 border border-gray-700 rounded-lg px-4 py-2 text-gray-100 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                                  placeholder="Tell us how we can help you..."></textarea>
+                    </div>
+
+                    <button type="submit" id="contact-submit" 
+                            class="w-full bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center justify-center">
+                        <span id="submit-text">Send Message</span>
+                        <i data-lucide="send" class="ml-2 h-4 w-4" id="submit-icon"></i>
+                    </button>
+                </form>
+
+                <!-- Alternative Contact Methods -->
+                <div class="mt-8 pt-8 border-t border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4 text-center">Other Ways to Reach Us</h3>
+                    <div class="flex justify-center space-x-6">
+                        <a href="https://github.com/John-Varghese-EH/ShadowMask/issues" target="_blank" 
+                           class="flex items-center text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="github" class="h-5 w-5 mr-2"></i>
+                            GitHub Issues
+                        </a>
+                        <a href="https://x.com/Cyber__Trinity" target="_blank" 
+                           class="flex items-center text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="twitter" class="h-5 w-5 mr-2"></i>
+                            Twitter
+                        </a>
+                        <a href="https://www.linkedin.com/in/john--varghese/" target="_blank" 
+                           class="flex items-center text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="linkedin" class="h-5 w-5 mr-2"></i>
+                            LinkedIn
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Creator Section -->
+    <section id="creator" class="py-24 bg-gray-950">
+        <div class="container mx-auto px-4">
+            <div class="max-w-3xl mx-auto bg-gray-800/50 rounded-xl p-8 backdrop-blur-lg border border-gray-700">
+                <div class="flex flex-col items-center">
+                    <div class="w-48 h-48 rounded-full overflow-hidden mb-6 ring-4 ring-purple-500/30">
+                        <img src="./src/logo.png" 
+                             alt="John Varghese" class="w-full h-full object-cover">
+                    </div>
+                    
+                    <h2 class="text-3xl font-bold mb-2 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-teal-400">
+                        John Varghese
+                    </h2>
+                    <p class="text-lg text-gray-400 mb-2">@Cyber_Trinity (J0X)</p>
+                    
+                    <div class="flex space-x-4 mb-8">
+                        <a href="https://github.com/John-Varghese-EH" target="_blank" 
+                           class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="github" class="h-6 w-6"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/john--varghese/" target="_blank" 
+                           class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="linkedin" class="h-6 w-6"></i>
+                        </a>
+                        <a href="https://x.com/Cyber__Trinity" target="_blank" 
+                           class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="twitter" class="h-6 w-6"></i>
+                        </a>
+                        <a href="https://www.instagram.com/cyber__trinity/" target="_blank" 
+                           class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="instagram" class="h-6 w-6"></i>
+                        </a>
+                        <a href="https://johnvarghese.netlify.app/" target="_blank" 
+                           class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="globe" class="h-6 w-6"></i>
+                        </a>
+                    </div>
+
+                    <div class="space-y-4 text-gray-300 mb-8">
+                        <p class="flex items-center">
+                            <span class="mr-2">🎓</span>
+                            Student passionate about cybersecurity, digital innovation, and lifelong learning
+                        </p>
+                        <p class="flex items-center">
+                            <span class="mr-2">🛡️</span>
+                            Empowering digital safety through technology and awareness
+                        </p>
+                        <p class="flex items-center">
+                            <span class="mr-2">💡</span>
+                            Exploring new tech, frameworks, and creative solutions
+                        </p>
+                        <p class="flex items-center">
+                            <span class="mr-2">🤝</span>
+                            Open to collaborations, mentorship, and knowledge sharing
+                        </p>
+                    </div>
+
+                    <!-- Projects Showcase -->
+                    <div class="w-full grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
+                            <h3 class="text-lg font-semibold mb-3 text-purple-400">ShadowMask</h3>
+                            <p class="text-gray-400 text-sm mb-4">
+                                Privacy-focused tool protecting images from AI recognition using advanced adversarial techniques.
+                            </p>
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span class="bg-purple-600/20 text-purple-400 px-2 py-1 rounded mr-2">Python</span>
+                                <span class="bg-teal-600/20 text-teal-400 px-2 py-1 rounded mr-2">AI/ML</span>
+                                <span class="bg-amber-600/20 text-amber-400 px-2 py-1 rounded">Privacy</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-900/50 rounded-lg p-6 border border-gray-700">
+                            <h3 class="text-lg font-semibold mb-3 text-teal-400">CyberTrinity</h3>
+                            <p class="text-gray-400 text-sm mb-4">
+                                Cybersecurity research and educational content platform for digital safety awareness.
+                            </p>
+                            <div class="flex items-center text-xs text-gray-500">
+                                <span class="bg-blue-600/20 text-blue-400 px-2 py-1 rounded mr-2">Security</span>
+                                <span class="bg-green-600/20 text-green-400 px-2 py-1 rounded mr-2">Education</span>
+                                <span class="bg-red-600/20 text-red-400 px-2 py-1 rounded">Research</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-900/50 rounded-lg p-6 border border-gray-700 w-full">
+                        <h3 class="text-xl font-semibold mb-4">About ShadowMask</h3>
+                        <p class="text-gray-400 mb-4">
+                            ShadowMask is a privacy-focused tool that protects your images from unauthorized AI-based facial recognition and scraping. 
+                            Using advanced techniques like Alpha Layer Attacks and Adversarial Patterns, it ensures your photos remain visible to humans 
+                            while being unreadable to AI systems.
+                        </p>
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            <a href="https://github.com/John-Varghese-EH/ShadowMask" target="_blank" 
+                               class="inline-flex items-center justify-center text-purple-400 hover:text-purple-300 transition-colors bg-purple-600/20 px-4 py-2 rounded-lg">
+                                <i data-lucide="github" class="h-5 w-5 mr-2"></i>
+                                View Project on GitHub
+                            </a>
+                            <a href="https://pypi.org/project/shadowmask/" target="_blank" 
+                               class="inline-flex items-center justify-center text-teal-400 hover:text-teal-300 transition-colors bg-teal-600/20 px-4 py-2 rounded-lg">
+                                <i data-lucide="package" class="h-5 w-5 mr-2"></i>
+                                PyPI Package
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="py-24 bg-gradient-to-r from-purple-900/50 to-teal-900/50">
+        <div class="container mx-auto px-4 text-center">
+            <h2 class="text-3xl md:text-4xl font-bold mb-6">Your Face, Your Rules – Beyond AI's Reach ✨</h2>
+            <p class="text-gray-300 max-w-2xl mx-auto mb-8">
+                Take back control of your digital identity. Download ShadowMask today and protect your photos from unauthorized AI analysis.
+            </p>
+            <div class="flex flex-col md:flex-row gap-4 justify-center">
+                <button onclick="scrollToSection('demo')" 
+                        class="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-purple-500/25 flex items-center justify-center">
+                    Try Live Demo
+                    <i data-lucide="play" class="ml-2 h-5 w-5"></i>
+                </button>
+                <button onclick="scrollToSection('download')" 
+                        class="bg-teal-600 hover:bg-teal-700 text-white px-8 py-4 rounded-lg transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-teal-500/25 flex items-center justify-center">
+                    Download Now
+                    <i data-lucide="download" class="ml-2 h-5 w-5"></i>
+                </button>
+                <a href="https://github.com/John-Varghese-EH/ShadowMask" target="_blank" 
+                   class="bg-transparent border border-gray-600 hover:border-gray-400 text-gray-300 hover:text-white px-8 py-4 rounded-lg transition-all duration-300 hover:scale-105 flex items-center justify-center">
+                    View on GitHub
+                    <i data-lucide="github" class="ml-2 h-5 w-5"></i>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-gray-950 border-t border-gray-800">
+        <div class="container mx-auto px-4 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="md:col-span-1">
+                    <a href="#home" class="flex items-center space-x-2 mb-4">
+                        <i data-lucide="shield" class="h-6 w-6 text-purple-500"></i>
+                        <span class="font-bold text-xl">ShadowMask</span>
+                    </a>
+                    <p class="text-gray-400 mb-4">
+                        Your Face, Your Rules – Beyond AI's Reach ✨
+                    </p>
+                    <div class="flex space-x-4">
+                        <a href="https://github.com/John-Varghese-EH/ShadowMask" target="_blank" 
+                           class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="github" class="h-5 w-5"></i>
+                        </a>
+                        <a href="https://x.com/Cyber__Trinity" target="_blank" 
+                           class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="twitter" class="h-5 w-5"></i>
+                        </a>
+                        <a href="https://www.linkedin.com/in/john--varghese/" target="_blank" 
+                           class="text-gray-400 hover:text-white transition-colors">
+                            <i data-lucide="linkedin" class="h-5 w-5"></i>
+                        </a>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Resources</h4>
+                    <ul class="space-y-2">
+                        <li><a href="https://github.com/John-Varghese-EH/ShadowMask/wiki" target="_blank" class="text-gray-400 hover:text-white transition-colors">Documentation</a></li>
+                        <li><a href="#api" class="text-gray-400 hover:text-white transition-colors">API Reference</a></li>
+                        <li><a href="https://github.com/John-Varghese-EH/ShadowMask" target="_blank" class="text-gray-400 hover:text-white transition-colors">GitHub</a></li>
+                        <li><a href="https://pypi.org/project/shadowmask/" target="_blank" class="text-gray-400 hover:text-white transition-colors">PyPI Package</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Downloads</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#download" class="text-gray-400 hover:text-white transition-colors">Windows</a></li>
+                        <li><a href="#download" class="text-gray-400 hover:text-white transition-colors">macOS</a></li>
+                        <li><a href="#download" class="text-gray-400 hover:text-white transition-colors">Linux</a></li>
+                        <li><a href="#download" class="text-gray-400 hover:text-white transition-colors">Android</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-lg font-semibold mb-4">Links</h4>
+                    <ul class="space-y-2">
+                        <li><a href="#contact" class="text-gray-400 hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#creator" class="text-gray-400 hover:text-white transition-colors">Creator</a></li>
+                        <li><a href="https://github.com/John-Varghese-EH/ShadowMask/blob/main/LICENSE" target="_blank" class="text-gray-400 hover:text-white transition-colors">License</a></li>
+                        <li><a href="https://github.com/John-Varghese-EH/ShadowMask/wiki/Privacy-Policy" target="_blank" class="text-gray-400 hover:text-white transition-colors">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="border-t border-gray-800 mt-12 pt-8 text-center text-gray-500 text-sm">
+                <p class="mb-2">© 2025 ShadowMask. All rights reserved.</p>
+                <p>
+                    Made with ❤️ by 
+                    <a href="https://github.com/John-Varghese-EH" target="_blank" 
+                       class="text-purple-400 hover:text-purple-300 transition-colors">
+                        John Varghese (J0X)
+                    </a>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Back to Top Button -->
+    <button id="back-to-top" class="fixed bottom-8 right-8 bg-purple-600 hover:bg-purple-700 text-white p-3 rounded-full shadow-lg transition-all duration-300 opacity-0 pointer-events-none z-40">
+        <i data-lucide="arrow-up" class="h-5 w-5"></i>
+    </button>
+
+    <!-- Scripts -->
+    <script src="./web/script.js"></script>
+    
+    <!-- Initialize Lucide Icons -->
+    <script>
+        lucide.createIcons();
+        
+        // Hide loading screen after everything loads
+        window.addEventListener('load', function() {
+            setTimeout(() => {
+                document.getElementById('loading-screen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('loading-screen').style.display = 'none';
+                }, 300);
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
